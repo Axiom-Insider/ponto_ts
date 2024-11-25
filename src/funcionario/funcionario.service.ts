@@ -52,7 +52,7 @@ export class FuncionarioService {
       }
 
       await this.prisma.funcionarios.update({ where: { id }, data: updateFuncionarioDto })
-      return
+      return { message: 'Funcionário atualizado com sucesso', codeStatus: HttpStatus.ACCEPTED}
     } catch (error) {
       throw new HttpException(`Erro ao atualizar dados: ${error}`, HttpStatus.NOT_MODIFIED)
     }

@@ -15,13 +15,27 @@ datasource db {
 
 
 
-model funcionarios{
+model Funcionarios{
   id Int @id @default(autoincrement())
   adm Boolean @default(false)
   primeiraEntrada Boolean @default(false)
   matricula Int @unique
   nome String
-  email String @unique
+  email String 
   cargo String 
   senha String 
+  horarios Horarios[]
+}
+
+model Horarios{
+  id Int @id @default(autoincrement())
+  dataCriado DateTime @default(now())
+  data String 
+  entrada Boolean @default(true)
+  saida Boolean @default(false)
+  hora_entrada String
+  hora_saida String? 
+  id_funcionario Int 
+  funcionarios  Funcionarios @relation(fields: [id_funcionario], references: [id])
+
 }
