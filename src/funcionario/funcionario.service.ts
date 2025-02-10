@@ -3,6 +3,10 @@ import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { hashSync as bcryptHashSync } from 'bcrypt'
+import { FuncionarioAll } from 'src/interfaces/funcionarioAll.type';
+import { FuncionarioOne } from 'src/interfaces/funcionarioOne.type';
+import { IGenerico } from 'src/interfaces/dados';
+import { IMessage } from 'src/interfaces/message.type';
 
 @Injectable()
 export class FuncionarioService {
@@ -12,47 +16,58 @@ export class FuncionarioService {
   async create(createFuncionarioDto: CreateFuncionarioDto) {
     try {
       const found = await this.prisma.funcionarios.findMany({
-        where: { OR: [{ matricula: createFuncionarioDto.matricula }, { email: createFuncionarioDto.email }] }
+        where: { OR: [{ matricula: createFuncionarioDto.matricula }] }
       })
 
       if (found.length > 0) {
-        throw ('Já registrado')
+        throw ('Funcionário já foi registrado')
       }
-
+      createFuncionarioDto.senha = '123'
       await this.prisma.funcionarios.create({ data: createFuncionarioDto })
-      return { message: 'Funcionário criado com sucesso', codeStatus: HttpStatus.CREATED }
+      return { message: 'Funcionário criado com sucesso', statusCode: HttpStatus.CREATED }
     } catch (error) {
       throw new HttpException(`Erro ao criar Funcionário: ${error}`, HttpStatus.NOT_IMPLEMENTED)
     }
   }
 
-  async findAll(): Promise<CreateFuncionarioDto[]> {
+  async findAll(): Promise<IGenerico<FuncionarioAll[]>> {
     try {
-      const funcionario = await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, email:true, cargo:true, senha:true} })
-      if (!funcionario || funcionario.length === 0) {
+      const dados: FuncionarioAll[] =  await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, cargo:true, senha:true} })
+      if (!dados || dados.length === 0) {
         throw ('Nenhum funcionário foi encontrado')
       }
-      return funcionario
+      return {dados, statusCode:HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao consultar tabela funcionário: ${error}`, HttpStatus.NOT_FOUND)
     }
   }
 
-  findOne(id: number) {
-    return 'vou mudar ainda'
+  async findMatricula(matricula: number):  Promise<IGenerico<FuncionarioOne>> {
+    try {
+       const dados: FuncionarioOne = await this.prisma.funcionarios.findFirst({where:{matricula}})
+        if(dados === null){
+          throw ('Sem registro de dados')
+        }
+        return {dados, statusCode:HttpStatus.OK}
+    } catch (error) {
+      throw new HttpException(`Erro ao consultar tabela funcionário: ${error}`, HttpStatus.NOT_FOUND)
+    }
   }
 
-  async update(id: number, updateFuncionarioDto: UpdateFuncionarioDto) {
+  async update(matricula: number, updateFuncionarioDto: UpdateFuncionarioDto): Promise<IMessage> {
     try {
       const found = await this.prisma.funcionarios.findUnique({
-        where: { id }
+        where: { matricula }
       })
       if (!found) {
         throw ('Funcionario não existe')
       }
 
-      await this.prisma.funcionarios.update({ where: { id }, data: updateFuncionarioDto })
-      return { message: 'Funcionário atualizado com sucesso', codeStatus: HttpStatus.ACCEPTED}
+      const funcionario = await this.prisma.funcionarios.updateMany({ where: { matricula }, data: updateFuncionarioDto })
+      if(funcionario.count > 0){  
+        return {  message:'Dados atualizados com sucesso', statusCode: HttpStatus.OK}
+      }
+      throw ('Nenhuma coluna foi alterada no sistema')
     } catch (error) {
       throw new HttpException(`Erro ao atualizar dados: ${error}`, HttpStatus.NOT_MODIFIED)
     }

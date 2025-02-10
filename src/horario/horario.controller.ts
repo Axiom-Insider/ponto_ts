@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { HorarioService } from './horario.service';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 
-
+@UseGuards(AuthGuard)
 @Controller('horario')
 export class HorarioController {
   constructor(private readonly horarioService: HorarioService) { }
@@ -23,8 +24,13 @@ export class HorarioController {
   }
 
   @Get('verificar/:id')
-  async verificar(@Param('id') id: string, @Res() res: Response) {
-    const horario = await this.horarioService.verificar(+id)
+  async verificarOne(@Param('id') id: string, @Res() res: Response) {
+    const horario = await this.horarioService.verificarOne(+id)
+    return res.status(horario.statusCode).json(horario)
+  }
+  @Get('verificar')
+  async verificarAll(@Param('id') id: string, @Res() res: Response) {
+    const horario = await this.horarioService.verificarAll()
     return res.status(horario.statusCode).json(horario)
   }
 
@@ -48,8 +54,15 @@ export class HorarioController {
    }
 
   @Delete('/entrada/:id')
-  async remove(@Res() res: Response, @Param('id') id: string) {
+  async removeEntrada(@Res() res: Response, @Param('id') id: string) {
     const horario = await this.horarioService.removeEntrada(+id);
     return res.status(horario.statusCode).json(horario)
   }
+
+   @Delete('/saida/:id')
+  async removeSaida(@Res() res: Response, @Param('id') id: string) {
+    const horario = await this.horarioService.removeSaida(+id);
+    return res.status(horario.statusCode).json(horario)
+  }
+
 }

@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { FuncionarioService } from './funcionario.service';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
+import {  Response } from 'express'
+
 
 @Controller('funcionario')
 export class FuncionarioController {
   constructor(private readonly funcionarioService: FuncionarioService) {}
 
-  @Post('')
-  async create(@Body() createFuncionarioDto: CreateFuncionarioDto) {
-    return await this.funcionarioService.create(createFuncionarioDto);
+  @Post()
+  async create(@Body() createFuncionarioDto: CreateFuncionarioDto, @Res() res: Response) {
+    const funcionario = await this.funcionarioService.create(createFuncionarioDto);
+    return res.status(funcionario.statusCode).json(funcionario)
   }
 
   @Get()
-  async findAll(): Promise<CreateFuncionarioDto[]> {
-    return this.funcionarioService.findAll();
+  async findAll(@Res() res: Response){
+    const findAll = await this.funcionarioService.findAll()
+    return res.status(findAll.statusCode).json(findAll.dados)
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.funcionarioService.findOne(+id);
+  async findOne(@Res() res: Response, @Param('id') id: string): Promise<{}> {
+    const findOne =  await this.funcionarioService.findMatricula(+id);
+    return res.status(findOne.statusCode).json(findOne.dados)
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFuncionarioDto: UpdateFuncionarioDto) {
-    return this.funcionarioService.update(+id, updateFuncionarioDto);
+  @Patch(':matricula')
+  async update(@Param('matricula') matricula: string, @Body() updateFuncionarioDto: UpdateFuncionarioDto, @Res() res: Response) {
+    const funcionario = await  this.funcionarioService.update(+matricula, updateFuncionarioDto);
+    return res.status(funcionario.statusCode).json(funcionario)
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.funcionarioService.remove(+id);
   }
 }

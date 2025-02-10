@@ -2,6 +2,10 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { historico, IHistorico } from 'src/interfaces/historico';
+import { IMessage } from 'src/interfaces/message.type';
+import { IHorariosOne } from 'src/interfaces/horariosOne';
+import { IHorariosAll } from 'src/interfaces/horariosAll';
 
 
 @Injectable()
@@ -24,8 +28,22 @@ export class HorarioService {
     const minutos = data.getMinutes().toString().padStart(2, '0')
     return `${horas}:${minutos}`
   }
+  
+ nomeMes(num: number) {
+    const date = new Date()
+    date.setMonth(num - 1)
 
-  async createEntrada(createHorarioDto: CreateHorarioDto) {
+    return date.toLocaleString('default', { month: 'long' })
+  }
+
+  nomeDia(ano: number, mes: number, dia: number) {
+    const data = new Date(ano, mes - 1, dia)
+    const nomeDia = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
+
+    return nomeDia[data.getDay()]
+  }
+
+  async createEntrada(createHorarioDto: CreateHorarioDto): Promise<IMessage> {
     try {
       const dataAtual = this.dataHoje()
       const horarios = await this.prisma.horarios.findFirst({ where: { AND: [{ data: dataAtual }, { id_funcionario: createHorarioDto.id_funcionario }] } })
@@ -33,7 +51,6 @@ export class HorarioService {
       if (horarios) {
         throw (`Entrada já foi registrada no sistema, data:${dataAtual}`)
       }
-      console.log('entroy');
 
       createHorarioDto.hora_entrada = this.horaHoje()
       createHorarioDto.data = dataAtual
@@ -44,7 +61,7 @@ export class HorarioService {
     }
   }
 
-  async createSaida(updateHorarioDto: UpdateHorarioDto) {
+  async createSaida(updateHorarioDto: UpdateHorarioDto): Promise<IMessage> {
     try {
       const dataAtual = this.dataHoje()
 
@@ -64,14 +81,16 @@ export class HorarioService {
     }
   }
 
-  async verificar(id_funcionario: number) {
+  async verificarOne(id_funcionario: number): Promise<IHorariosOne> {
     try {
       const data = this.dataHoje()
 
-      const entradaSaida = await this.prisma.horarios.findMany({ where: { AND: [{ id_funcionario }, { data }] }, select: { entrada: true, saida: true } })
+      var entradaSaida = await this.prisma.horarios.findMany({ where: { AND: [{ id_funcionario }, { data }] }, select: { entrada: true, saida: true } })
 
       if (entradaSaida.length <= 0) {
-        return { entrada: false, saida: false, statusCode: HttpStatus.OK }
+        entradaSaida[0].entrada = false
+        entradaSaida[0].saida = false
+        return {entradaSaida, statusCode: HttpStatus.OK }
       }
 
       return { entradaSaida, statusCode: HttpStatus.FOUND }
@@ -80,24 +99,24 @@ export class HorarioService {
     }
   }
 
-  nomeMes(num: number) {
-    const date = new Date()
-    date.setMonth(num - 1)
+    async verificarAll(): Promise<IHorariosAll>{
+      try {
+        const dataHoje = this.dataHoje()
+    
+        const horario = await this.prisma.horarios.findMany({include:{funcionarios:true}, where:{data:dataHoje, entrada:true}})
+        
+        return{ horario, statusCode:HttpStatus.FOUND}        
+      } catch (error) {
+        throw new HttpException(`Erro ao verificar dados de entrada e saída: ${error}`, HttpStatus.NOT_FOUND)
+      }
+    }
 
-    return date.toLocaleString('default', { month: 'long' })
-  }
+ 
 
-  nomeDia(ano: number, mes: number, dia: number) {
-    const data = new Date(ano, mes - 1, dia)
-    const nomeDia = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
-
-    return nomeDia[data.getDay()]
-  }
-
-  async historico(id_funcionario: number, mes: string, ano: string) {
+  async historico(id_funcionario: number, mes: string, ano: string): Promise<IHistorico> {
     try {
 
-      const historico = []
+      const historico: historico[] = []
       const quantidadeDia = new Date(+ano, +mes, 0).getDate();
       const nomeMes = this.nomeMes(quantidadeDia)
       const horarios = await this.prisma.horarios.findMany({ where: { id_funcionario, data: { startsWith: `${ano}-${mes}` } }, orderBy: { dataCriado: 'asc' } })
@@ -136,7 +155,7 @@ export class HorarioService {
     }
   }
 
-  async updateEntrada(id_funcionario: number, mes: string, ano: string, dia: string, updateHorarioDto: UpdateHorarioDto) {
+  async updateEntrada(id_funcionario: number, mes: string, ano: string, dia: string, updateHorarioDto: UpdateHorarioDto): Promise<IMessage> {
     try {
       const data = `${ano}-${mes}-${dia}`
       const horario = await this.prisma.horarios.findMany({ where: { AND: [{ id_funcionario }, { data }] } })
@@ -168,7 +187,7 @@ export class HorarioService {
     }
   }
 
-  async updateSaida(id_funcionario: number, mes: string, ano: string, dia: string, updateHorarioDto: UpdateHorarioDto) {
+  async updateSaida(id_funcionario: number, mes: string, ano: string, dia: string, updateHorarioDto: UpdateHorarioDto): Promise<IMessage> {
     try {
       const data = `${ano}-${mes}-${dia}`
       const horario = await this.prisma.horarios.findMany({ where: { AND: [{ id_funcionario }, { data }] } })
@@ -192,7 +211,7 @@ export class HorarioService {
     }
   }
 
-  async removeEntrada(id: number) {
+  async removeEntrada(id: number): Promise<IMessage> {
     try {
       const found = await this.prisma.horarios.findUnique({ where: { id } })
 
@@ -211,4 +230,26 @@ export class HorarioService {
       throw new HttpException(`Erro ao remover entrada: ${error}`, HttpStatus.NOT_FOUND)
     }
   }
+
+async removeSaida(id: number): Promise<IMessage> {
+  try {
+    const found = await this.prisma.horarios.findUnique({ where: { id } })
+
+    if (found) {
+      const entrada = await this.prisma.horarios.update({ where: { id }, data:{hora_saida:null, saida:false}})
+      if (entrada) {
+        return { message: "Saída removido com sucesso", statusCode: HttpStatus.OK }
+      }
+      if (!entrada) {
+        throw ('Nenhum registro de saída foi encontrado no sistema')
+      }
+    }
+
+    throw ('Nenhuma saida foi encontrada no sistema')
+  } catch (error) {
+    throw new HttpException(`Erro ao remover saída: ${error}`, HttpStatus.NOT_FOUND)
+  }
+}
+
+
 }

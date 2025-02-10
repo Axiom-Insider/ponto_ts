@@ -1,15 +1,6 @@
 import { IsBoolean, IsEmail, IsNotEmpty,  IsNumber, IsString, IsOptional } from "class-validator";
 
-export class CreateFuncionarioDto {
-    @IsNumber()
-    @IsOptional()
-    id?:number;
-
-    @IsOptional()
-    adm?:boolean;
-
-    @IsOptional()
-    primeiraEntrada?:boolean;
+export class LoginDto {
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsNumber({}, {message:'Argumento matricula precisa ser um number'})
@@ -17,15 +8,11 @@ export class CreateFuncionarioDto {
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})
-    nome:string;
-
-    @IsNotEmpty({message:'Campo vazio Invalido'})
-    @IsString({message:'Argumento passado não é uma string'})
-    cargo:string;
+    senha:string;
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})
     @IsOptional()
-    senha:string;
+    novaSenha?:string;
 
 }

@@ -21,7 +21,6 @@ model Funcionarios{
   primeiraEntrada Boolean @default(false)
   matricula Int @unique
   nome String
-  email String 
   cargo String 
   senha String 
   horarios Horarios[]
@@ -37,5 +36,14 @@ model Horarios{
   hora_saida String? 
   id_funcionario Int 
   funcionarios  Funcionarios @relation(fields: [id_funcionario], references: [id])
-
 }
+
+model feriados{
+  id Int @id @default(autoincrement())
+  nome String 
+  data String
+  dataSec String
+  nacional Boolean 
+}
+
+
