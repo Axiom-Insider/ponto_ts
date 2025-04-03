@@ -46,7 +46,7 @@ export class FuncionarioService {
     try {
        const dados: FuncionarioOne = await this.prisma.funcionarios.findFirst({where:{matricula}})
         if(dados === null){
-          throw ('Sem registro de dados')
+          throw ('Sem registros para a matrícula informada')
         }
         return {dados, statusCode:HttpStatus.OK}
     } catch (error) {

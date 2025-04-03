@@ -9,16 +9,14 @@ import { Feriados } from 'src/interfaces/feriados';
 @Injectable()
 export class FeriadosService {
 
-
   constructor(private readonly prisma: PrismaService) { }
 
   async create(createFeriadoDto: CreateFeriadoDto): Promise<IMessage> {
     try {
-      const dados = await this.prisma.feriados.create({ data: createFeriadoDto })
-
+      await this.prisma.feriados.create({ data: createFeriadoDto })
       return { message: 'Feriado criado com sucesso', statusCode: HttpStatus.CREATED}
     } catch (error) {
-            throw new HttpException(`Erro ao registrar feriado ${error}`, HttpStatus.CONFLICT)
+            throw new HttpException(`Erro ao registrar feriado ${error.message}`, HttpStatus.CONFLICT)
     }
   }
 
@@ -27,11 +25,11 @@ export class FeriadosService {
       const dados = await this.prisma.feriados.findMany()
 
       if(!dados || dados.length === 0){
-        throw ('Nenhum feriado encontrado')
+        throw new HttpException('Nenhum feriado encontrado', HttpStatus.NOT_FOUND)
        }
       return {dados, statusCode:HttpStatus.OK}
     } catch (error) {
-      throw new HttpException(`Erro ao consultar tabela feriados: ${error}`, HttpStatus.NOT_FOUND)
+      throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
 
@@ -39,27 +37,32 @@ export class FeriadosService {
     try {
       const dados = await this.prisma.feriados.findUnique({where:{id}})
       if(!dados){
-        throw ('Sem registro de dados')
+        throw new HttpException('Sem registro de dados', HttpStatus.NOT_FOUND)
       }
       return {dados, statusCode:HttpStatus.OK}
     } catch (error) {
-      throw new HttpException(`Erro ao consultar tabela feriados: ${error}`, HttpStatus.NOT_FOUND)
+      throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
 
-  update(id: number, updateFeriadoDto: UpdateFeriadoDto) {
-    return `This action updates a #${id} feriado`;
+  async update(id: number, updateFeriadoDto: UpdateFeriadoDto) {
+    try {
+      await this.prisma.feriados.update({
+        where: { id },
+        data: updateFeriadoDto,
+      });
+      return { message: 'Feriado atualizado com sucesso', statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(`Erro ao atualizar feriado: ${error.message}`, HttpStatus.CONFLICT);
+    }
   }
 
   async remove(id: number) {
     try {
-      const dados = await this.prisma.feriados.delete({where:{id}})
-      if(!dados){
-        throw ('Sem registro de dados')
-      }
+      await this.prisma.feriados.delete({where:{id}})
       return {message:'Feriado removido com sucesso', statusCode:HttpStatus.OK}
     } catch (error) {
-      throw new HttpException(`Erro ao deletar feriado: ${error}`, HttpStatus.NOT_FOUND)
+      throw new HttpException(`Erro ao deletar feriado: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
 }

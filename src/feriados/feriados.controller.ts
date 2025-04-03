@@ -1,29 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { FeriadosService } from './feriados.service';
 import { CreateFeriadoDto } from './dto/create-feriado.dto';
 import { UpdateFeriadoDto } from './dto/update-feriado.dto';
-import { Response } from 'express';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('feriados')
 export class FeriadosController {
   constructor(private readonly feriadosService: FeriadosService) {}
 
   @Post()
-  async create(@Body() createFeriadoDto: CreateFeriadoDto, @Res() res: Response) {
-    const dados = await  this.feriadosService.create(createFeriadoDto)
-    return res.status(dados.statusCode).json(dados)
+    create(@Body() createFeriadoDto: CreateFeriadoDto) {
+      return this.feriadosService.create(createFeriadoDto)
   }
 
   @Get()
-  async findAll(@Res() res: Response) {
-    const dados = await this.feriadosService.findAll()
-    return res.status(dados.statusCode).json(dados.dados)
-  }
+  findAll() {
+    return this.feriadosService.findAll()  
+}
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() res: Response) {
-      const dados = await this.feriadosService.findOne(+id)
-      return res.status(dados.statusCode).json(dados.dados)
+   findOne(@Param('id') id: string) {
+      return this.feriadosService.findOne(+id)
     }
 
   @Patch(':id')
@@ -32,8 +30,7 @@ export class FeriadosController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string, @Res() res: Response) {
-    const dados = await this.feriadosService.remove(+id);
-    return res.status(dados.statusCode).json(dados)
+   remove(@Param('id') id: string) {
+    return this.feriadosService.remove(+id);
   }
 }

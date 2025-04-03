@@ -27,17 +27,20 @@ export class AuthService {
             if (!found.dados) {
                 throw ('Nenhum funcionário com essas credencias foi encontrado')
             }
-            if (found.dados.primeiraEntrada && bcryptCompareSync(senha, found.dados.senha)) {
-                const payload = { sub: found.dados.id, username: found.dados.matricula }
-                const token = this.jwtService.sign(payload)
-                return { token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
-            }
 
-            if(!bcryptCompareSync(senha, found.dados.senha))throw ("Senha incorreta")
+            if(found.dados.primeiraEntrada){
+                if(bcryptCompareSync(senha, found.dados.senha)){
+                    const payload = { sub: found.dados.id, username: found.dados.matricula }
+                    const token = this.jwtService.sign(payload)
+                    return { token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
+                }
+                throw ('A Senha está incorreta')
+            }
 
             if(senha != found.dados.senha){
-                throw ("Senha incorreta. A senha para a primeira sessão é '123'")
+                throw ("Senha incorreta. A senha para o primeiro acesso '123'")
             }
+
             const updateFuncionarioDto: UpdateFuncionarioDto = {
                 matricula,
                 senha:bcryptHashSync(novaSenha, 10),

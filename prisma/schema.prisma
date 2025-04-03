@@ -24,6 +24,7 @@ model Funcionarios{
   cargo String 
   senha String 
   horarios Horarios[]
+  ausencia Ausencia[]
 }
 
 model Horarios{
@@ -38,7 +39,7 @@ model Horarios{
   funcionarios  Funcionarios @relation(fields: [id_funcionario], references: [id])
 }
 
-model feriados{
+model Feriados{
   id Int @id @default(autoincrement())
   nome String 
   data String
@@ -46,4 +47,13 @@ model feriados{
   nacional Boolean 
 }
 
+model Ausencia{
+  id Int @id @default(autoincrement())
+  ferias Boolean 
+  atestado Boolean 
+  data_entrada String
+  data_saida String 
+  id_funcionario Int
+  funcionarios Funcionarios @relation(fields: [id_funcionario], references: [id])
+}
 

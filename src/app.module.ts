@@ -9,10 +9,11 @@ import { ConfigModule } from '@nestjs/config';
 import { FeriadosService } from './feriados/feriados.service';
 import { FeriadosController } from './feriados/feriados.controller';
 import { FeriadosModule } from './feriados/feriados.module';
-import { FeriadosModule } from './feriados/feriados.module';
+import { AusenciaModule } from './ausencia/ausencia.module';
+import { DocumentoModule } from './documento/documento.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({isGlobal:true}), FuncionarioModule, PrismaModule, AuthModule, HorarioModule, FeriadosModule],
+  imports: [ConfigModule.forRoot({isGlobal:true}), FuncionarioModule, PrismaModule, AuthModule, HorarioModule, FeriadosModule, AusenciaModule, DocumentoModule],
   controllers: [AppController, FeriadosController],
   providers: [AppService, FeriadosService],
 })
