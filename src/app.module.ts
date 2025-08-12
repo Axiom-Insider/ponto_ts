@@ -14,7 +14,7 @@ import { DocumentoModule } from './documento/documento.module';
 
 @Module({
   imports: [ConfigModule.forRoot({isGlobal:true}), FuncionarioModule, PrismaModule, AuthModule, HorarioModule, FeriadosModule, AusenciaModule, DocumentoModule],
-  controllers: [AppController, FeriadosController],
-  providers: [AppService, FeriadosService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

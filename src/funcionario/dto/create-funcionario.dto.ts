@@ -25,6 +25,10 @@ export class CreateFuncionarioDto {
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})
+    empresa:string;
+
+    @IsNotEmpty({message:'Campo vazio Invalido'})
+    @IsString({message:'Argumento passado não é uma string'})
     @IsOptional()
     senha:string;
 

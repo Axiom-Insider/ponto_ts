@@ -22,6 +22,7 @@ model Funcionarios{
   matricula Int @unique
   nome String
   cargo String 
+  empresa String
   senha String 
   horarios Horarios[]
   ausencia Ausencia[]
