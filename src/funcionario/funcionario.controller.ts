@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards } from '@nestjs/common';
 import { FuncionarioService } from './funcionario.service';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
 import {  Response } from 'express'
+import { AuthGuard } from 'src/auth/auth.guard';
 
 
+@UseGuards(AuthGuard)
 @Controller('funcionario')
 export class FuncionarioController {
   constructor(private readonly funcionarioService: FuncionarioService) {}
