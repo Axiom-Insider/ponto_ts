@@ -6,7 +6,7 @@ import {  Response } from 'express'
 import { AuthGuard } from 'src/auth/auth.guard';
 
 
-@UseGuards(AuthGuard)
+//@UseGuards(AuthGuard)
 @Controller('funcionario')
 export class FuncionarioController {
   constructor(private readonly funcionarioService: FuncionarioService) {}
