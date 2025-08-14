@@ -28,11 +28,13 @@ export class AuthService {
                 throw ('Nenhum funcionário com essas credencias foi encontrado')
             }
 
+            const funcionario = {matricula:dados.matricula, adm:dados.adm, primeiraEntrada:dados.primeiraEntrada}
+
             if(dados.primeiraEntrada){
                 if(bcryptCompareSync(senha, dados.senha)){
                     const payload = { sub: dados.id, username: dados.matricula }
                     const token = this.jwtService.sign(payload)
-                    return {funcionarios:dados, token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
+                    return {funcionario, token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
                 }
                 throw ('A Senha está incorreta')
             }
