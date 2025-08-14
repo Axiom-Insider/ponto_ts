@@ -22,22 +22,22 @@ export class AuthService {
     async signIn(loginDto:LoginDto) {
         try {
             const {matricula, senha, novaSenha} = loginDto
-            const found = await this.funcionarioService.findMatricula(matricula)
+            const {dados} = await this.funcionarioService.findMatricula(matricula)
     
-            if (!found.dados) {
+            if (!dados) {
                 throw ('Nenhum funcionário com essas credencias foi encontrado')
             }
 
-            if(found.dados.primeiraEntrada){
-                if(bcryptCompareSync(senha, found.dados.senha)){
-                    const payload = { sub: found.dados.id, username: found.dados.matricula }
+            if(dados.primeiraEntrada){
+                if(bcryptCompareSync(senha, dados.senha)){
+                    const payload = { sub: dados.id, username: dados.matricula }
                     const token = this.jwtService.sign(payload)
-                    return { token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
+                    return {funcionarios:dados, token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
                 }
                 throw ('A Senha está incorreta')
             }
 
-            if(senha != found.dados.senha){
+            if(senha != dados.senha){
                 throw ("Senha incorreta. A senha para o primeiro acesso '123'")
             }
 
