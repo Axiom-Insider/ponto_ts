@@ -21,7 +21,8 @@ export class AuthService {
 
     async signIn(loginDto:LoginDto) {
         try {
-            const {matricula, senha, novaSenha} = loginDto
+            const {matricula, senha} = loginDto
+            const novaSenha = loginDto.novaSenha || null
             const {dados} = await this.funcionarioService.findMatricula(matricula)
     
             if (!dados) {
@@ -41,6 +42,11 @@ export class AuthService {
 
             if(senha != dados.senha){
                 throw ("Senha incorreta. A senha para o primeiro acesso '123'")
+            }
+
+            
+            if(!novaSenha){
+               return {primeiraEntrada:funcionario.primeiraEntrada, statusCode: HttpStatus.ACCEPTED}
             }
 
             const updateFuncionarioDto: UpdateFuncionarioDto = {
