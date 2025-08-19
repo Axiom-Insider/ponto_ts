@@ -35,7 +35,7 @@ export class AuthService {
                 if(bcryptCompareSync(senha, dados.senha)){
                     const payload = { sub: dados.id, username: dados.matricula }
                     const token = this.jwtService.sign(payload)
-                    return {funcionario, token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
+                    return {primeiraEntrada:funcionario.primeiraEntrada, funcionario, token, expiresIn: this.jwtEpiration, statusCode: HttpStatus.OK }
                 }
                 throw ('A Senha está incorreta')
             }
