@@ -41,7 +41,7 @@ export class AuthService {
             }
 
             if(senha != dados.senha){
-                throw ("Senha incorreta. A senha para o primeiro acesso '123'")
+                throw ("Senha incorreta. A senha para o primeiro acesso é '123'")
             }
 
             
