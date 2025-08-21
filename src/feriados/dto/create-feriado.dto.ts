@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsBoolean, IsDate, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateFeriadoDto {
 
@@ -10,11 +10,13 @@ export class CreateFeriadoDto {
     nome:string;
 
     @IsString()
-    data:string;
+    @IsDate()
+    dataInicio:Date;
 
     @IsString()
     @IsOptional()
-    dataSec:string;
+    @IsDate()
+    dataFim:Date;
 
     @IsBoolean()
     nacional:boolean;

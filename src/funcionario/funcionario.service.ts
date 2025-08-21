@@ -7,11 +7,21 @@ import { FuncionarioAll } from 'src/interfaces/funcionarioAll.type';
 import { FuncionarioOne } from 'src/interfaces/funcionarioOne.type';
 import { IGenerico } from 'src/interfaces/dados';
 import { IMessage } from 'src/interfaces/message.type';
+import { FuncionarioHorarioDto } from './dto/funcionario-horario.dto';
 
 @Injectable()
 export class FuncionarioService {
 
   constructor(private readonly prisma: PrismaService) { }
+
+
+  async horariosDia(funcionarioHorario: FuncionarioHorarioDto){
+    try {
+      const funcionario = await this.prisma.funcionarios.findMany()
+    } catch (error) {
+      
+    }
+  }
 
   async create(createFuncionarioDto: CreateFuncionarioDto) {
     try {

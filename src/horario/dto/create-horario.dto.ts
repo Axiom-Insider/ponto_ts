@@ -11,20 +11,12 @@ export class CreateHorarioDto {
     data:string;
 
     @IsOptional()
-    @IsBoolean()
-    entrada:boolean;
+    @IsDate()
+    entrada:Date;
 
     @IsOptional()
-    @IsBoolean()
-    saida:boolean;
-
-    @IsString()
-    @IsOptional()
-    hora_entrada:string;
-
-    @IsOptional()
-    @IsString()
-    hora_saida:string;
+    @IsDate()
+    saida:Date;
 
     @IsNumber()
     id_funcionario:number;

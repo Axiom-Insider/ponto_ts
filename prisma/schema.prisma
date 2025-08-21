@@ -13,7 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+enum TipoAusencia {
+  FERIAS 
+  ATESTADO 
+  LICENCA
+  OUTRO
+}
 
 model Funcionarios{
   id Int @id @default(autoincrement())
@@ -30,12 +35,9 @@ model Funcionarios{
 
 model Horarios{
   id Int @id @default(autoincrement())
-  dataCriado DateTime @default(now())
-  data String 
-  entrada Boolean @default(true)
-  saida Boolean @default(false)
-  hora_entrada String
-  hora_saida String? 
+  dataCriado DateTime @default(now()) 
+  entrada DateTime
+  saida DateTime? 
   id_funcionario Int 
   funcionarios  Funcionarios @relation(fields: [id_funcionario], references: [id])
 }
@@ -43,17 +45,16 @@ model Horarios{
 model Feriados{
   id Int @id @default(autoincrement())
   nome String 
-  data String
-  dataSec String
+  dataInicio DateTime
+  dataFim DateTime
   nacional Boolean 
 }
 
 model Ausencia{
   id Int @id @default(autoincrement())
-  ferias Boolean 
-  atestado Boolean 
-  data_entrada String
-  data_saida String 
+  tipoAusencia TipoAusencia 
+  dataInicio DateTime
+  dataFim DateTime? 
   id_funcionario Int
   funcionarios Funcionarios @relation(fields: [id_funcionario], references: [id])
 }
