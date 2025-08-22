@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAusenciaDto } from './dto/create-ausencia.dto';
 import { UpdateAusenciaDto } from './dto/update-ausencia.dto';
+import { Ausencia } from "src/interfaces/ausencia";
 import { PrismaService } from 'src/prisma/prisma.service';
 import { IGenerico } from 'src/interfaces/dados';
 import { IMessage } from 'src/interfaces/message.type';
@@ -19,7 +20,7 @@ export class AusenciaService {
       }
   }
 
-  async findAll(): Promise<IGenerico<CreateAusenciaDto[]> | HttpException> {
+  async findAll(): Promise<IGenerico<Ausencia[]> | HttpException> {
       try {
         const dados = await this.prisma.ausencia.findMany()
         return {dados, statusCode: HttpStatus.CREATED}
@@ -28,7 +29,7 @@ export class AusenciaService {
       }
   }
 
-  async findOne(id_funcionario: number):Promise<IGenerico<CreateAusenciaDto[]> | HttpException> {
+  async findOne(id_funcionario: number):Promise<IGenerico<Ausencia[]> | HttpException> {
     try {
       const dados = await this.prisma.ausencia.findMany({ where: { id_funcionario } })
       return {dados,  message: 'Ausência criada com sucesso', statusCode: HttpStatus.CREATED}

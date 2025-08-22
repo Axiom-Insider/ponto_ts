@@ -1,7 +1,7 @@
  export type Feriados = { 
     id: number;
     nome: string;
-    data: string;
-    dataSec: string;
+    dataInicio: date;
+    dataFim: date;
     nacional: boolean;
 }

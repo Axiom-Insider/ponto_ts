@@ -35,7 +35,7 @@ model Funcionarios{
 
 model Horarios{
   id Int @id @default(autoincrement())
-  dataCriado DateTime @default(now()) 
+  dataCriado DateTime  
   entrada DateTime
   saida DateTime? 
   id_funcionario Int 

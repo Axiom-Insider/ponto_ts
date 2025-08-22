@@ -1,4 +1,5 @@
-import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
+import { TipoAusencia } from "@prisma/client";
+import { IsDateString, IsEnum, IsNumber, IsOptional } from "class-validator";
 
 
 export class CreateAusenciaDto {
@@ -7,19 +8,16 @@ export class CreateAusenciaDto {
     @IsNumber()
     id:number;
 
-    @IsBoolean()
-    ferias:boolean;
+    @IsEnum(TipoAusencia)
+    tipoAusencia:TipoAusencia;
 
-    @IsBoolean()
-    atestado:boolean;
+    @IsDateString()
+    dataInicio: string;
 
-    @IsString()
-    data_entrada:string;
-
-    @IsString()
     @IsOptional()
-    data_saida:string;
+    @IsDateString()
+    dataFim?: string;
 
     @IsNumber()
-    id_funcionario:number;
+    id_funcionario: number;
 }

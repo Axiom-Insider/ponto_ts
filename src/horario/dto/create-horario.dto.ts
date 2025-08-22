@@ -1,4 +1,4 @@
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDateString, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateHorarioDto {
 
@@ -8,15 +8,19 @@ export class CreateHorarioDto {
 
     @IsString()
     @IsOptional()
-    data:string;
+    data?:string;
+
+    @IsString()
+    @IsOptional()
+    dataCriada?:string;
 
     @IsOptional()
-    @IsDate()
-    entrada:Date;
+    @IsDateString()
+    entrada?:string;
 
     @IsOptional()
-    @IsDate()
-    saida:Date;
+    @IsDateString()
+    saida?:string;
 
     @IsNumber()
     id_funcionario:number;
