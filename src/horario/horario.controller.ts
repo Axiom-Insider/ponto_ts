@@ -16,9 +16,9 @@ export class HorarioController {
     return res.status(horario.statusCode).json(horario)
   }
 
-  @Get('')
+  @Get('/dia')
   async getAll(@Res() res: Response){
-    const horario = await this.horarioService.getHorario()
+    const horario = await this.horarioService.getHorarioDia()
     return res.status(horario.statusCode).json(horario)    
   }
 

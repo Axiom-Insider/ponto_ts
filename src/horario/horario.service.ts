@@ -7,12 +7,13 @@ import { IMessage } from 'src/interfaces/message.type';
 import { IHorariosOne } from 'src/interfaces/horariosOne';
 import { IHorariosAll } from 'src/interfaces/horariosAll';
 import { toZonedTime } from "date-fns-tz"
+import { HorarioDoDia } from 'src/interfaces/horarioDoDia';
 
 @Injectable()
 export class HorarioService {
   private readonly fusoHorario: string;
 
-  constructor(private readonly prisma: PrismaService) { 
+  constructor(private readonly prisma: PrismaService) {
     this.fusoHorario = "America/Bahia"
   }
 
@@ -22,8 +23,8 @@ export class HorarioService {
     const minutos = data.getMinutes().toString().padStart(2, '0')
     return `${horas}:${minutos}`
   }
-  
- nomeMes(num: number) {
+
+  nomeMes(num: number) {
     const date = new Date()
     date.setMonth(num - 1)
 
@@ -41,37 +42,63 @@ export class HorarioService {
     try {
       const data = new Date()
       const dataLocal = toZonedTime(data, this.fusoHorario)
-      const dataHoje = new Date()
-      const {id_funcionario} = createHorarioDto
-      const horarios = await this.prisma.horarios.findFirst({ where: { AND: [{dataCriado:dataHoje}, { id_funcionario}] } })
-      
+      const { id_funcionario } = createHorarioDto
+      const inicioDoDia = new Date(dataLocal);
+      inicioDoDia.setHours(0, 0, 0, 0);
+      const fimDoDia = new Date(dataLocal);
+      fimDoDia.setHours(23, 59, 59, 999);
+      const horarios = await this.prisma.horarios.findFirst({
+        where: {
+          AND: [
+            {
+              dataCriado: {
+                gte: inicioDoDia,
+                lt: fimDoDia,
+              },
+            },
+            {
+              id_funcionario: id_funcionario,
+            },
+          ],
+        },
+      });
+
       if (horarios) {
         throw (`Entrada já foi registrada no sistema`)
       }
 
-      const apenasHora = new Date()
-      await this.prisma.horarios.create({data:{dataCriado:dataHoje, entrada:apenasHora, id_funcionario}})
+      await this.prisma.horarios.create({ data: { dataCriado: dataLocal, entrada: dataLocal, id_funcionario } })
       return { message: 'Entrada registrada com sucesso', statusCode: HttpStatus.CREATED }
     } catch (error) {
       throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT)
     }
   }
 
-  async getHorario():Promise<any>{
+  async getHorarioDia(): Promise<HorarioDoDia> {
     try {
-      const data = new Date()
-      const apenasData = new Date(data.getFullYear(), data.getMonth(), data.getDate());
-      const dados = await this.prisma.horarios.findFirst({where:{dataCriado:{ 
-        gte:apenasData,
-        lt: new Date(data.getTime() + 24 * 60 * 60 * 1000)
-    }}})
-      console.log(dados);
-      console.log(`${dados.entrada.getHours()}:${dados.entrada.getMinutes()}`);
-      console.log( dados.dataCriado.getDate(), dados.dataCriado.getMonth(), dados.dataCriado.getFullYear());
+      const date = new Date()
+      const dataLocal = toZonedTime(date, this.fusoHorario)
+      const inicioDoDia = new Date(dataLocal);
+      inicioDoDia.setHours(0, 0, 0, 0);
+      const fimDoDia = new Date(dataLocal);
+      fimDoDia.setHours(23, 59, 59, 999);
+      const dados = await this.prisma.horarios.findFirst({
+        where: {
+          dataCriado: {
+            gte: inicioDoDia,
+            lt: fimDoDia,
+          },
+        },
+      })
+      if(!dados){
+        return {entrada:null, saida:null, statusCode:HttpStatus.FOUND}
+      }
       
-      return { message: 'Entrada registrada com sucesso', statusCode: HttpStatus.CREATED }
+      const entrada = `${dados.entrada.getHours()}:${dados.entrada.getMinutes() < 10? "0" + dados.entrada.getMinutes() : dados.entrada.getMinutes()}`
+      const saida = `${dados.saida.getHours()}:${dados.saida.getMinutes() < 10? "0" + dados.saida.getMinutes() : dados.saida.getMinutes()}`      
+      return {  saida, entrada, statusCode: HttpStatus.FOUND}
     } catch (error) {
-      throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT)
+      throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.CONFLICT)
     }
   }
 
