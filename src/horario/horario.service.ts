@@ -74,6 +74,42 @@ export class HorarioService {
     }
   }
 
+  async registrarSaida(createHorarioDto:CreateHorarioDto):Promise<IMessage>{
+    try {
+      const data = new Date()
+      const dataLocal = toZonedTime(data, this.fusoHorario)
+      const { id_funcionario } = createHorarioDto
+      const inicioDoDia = new Date(dataLocal);
+      inicioDoDia.setHours(0, 0, 0, 0);
+      const fimDoDia = new Date(dataLocal);
+      fimDoDia.setHours(23, 59, 59, 999);
+      const horarios = await this.prisma.horarios.findFirst({
+        where: {
+          AND: [
+            {
+              dataCriado: {
+                gte: inicioDoDia,
+                lt: fimDoDia,
+              },
+            },
+            {
+              id_funcionario: id_funcionario,
+            },
+          ],
+        },
+      });
+
+      if (horarios) {
+        throw (`Entrada já foi registrada no sistema`)
+      }
+
+      await this.prisma.horarios.updateMany({where:{id_funcionario}, data: { saida:dataLocal} })
+      return { message: 'Saída registrada com sucesso', statusCode: HttpStatus.CREATED }
+    } catch (error) {
+      throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT)
+    }
+  }
+
   async getHorarioDia(): Promise<HorarioDoDia> {
     try {
       const date = new Date()
@@ -89,14 +125,27 @@ export class HorarioService {
             lt: fimDoDia,
           },
         },
+        select:{
+          entrada:true, saida:true,
+          funcionarios:{
+            select:{
+              nome:true, matricula:true, cargo:true, id:true
+            }
+          }
+        }
       })
       if(!dados){
-        return {entrada:null, saida:null, statusCode:HttpStatus.FOUND}
+        return {funcionarios:null, entrada:null, saida:null, statusCode:HttpStatus.FOUND}
       }
       
+      const funcionarios = dados.funcionarios
+      console.log(dados);
+      
       const entrada = `${dados.entrada.getHours()}:${dados.entrada.getMinutes() < 10? "0" + dados.entrada.getMinutes() : dados.entrada.getMinutes()}`
-      const saida = `${dados.saida.getHours()}:${dados.saida.getMinutes() < 10? "0" + dados.saida.getMinutes() : dados.saida.getMinutes()}`      
-      return {  saida, entrada, statusCode: HttpStatus.FOUND}
+     
+      const saida = dados.saida ? `${dados.saida.getHours()}:${dados.saida.getMinutes() < 10? "0" + dados.saida.getMinutes() : dados.saida.getMinutes()}` : null      
+      
+      return {funcionarios,  saida, entrada, statusCode: HttpStatus.FOUND}
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.CONFLICT)
     }
