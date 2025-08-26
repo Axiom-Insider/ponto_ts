@@ -99,11 +99,21 @@ export class HorarioService {
         },
       });
 
-      if (horarios) {
-        throw (`Entrada já foi registrada no sistema`)
+      if (horarios.saida) {
+        throw (`Saida já foi registrada no sistema`)
       }
 
-      await this.prisma.horarios.updateMany({where:{id_funcionario}, data: { saida:dataLocal} })
+      await this.prisma.horarios.updateMany({where:{ AND:[
+            {
+              dataCriado: {
+                gte: inicioDoDia,
+                lt: fimDoDia,
+              },
+            },
+            {
+              id_funcionario: id_funcionario,
+            },
+          ],}, data: { saida:dataLocal} })
       return { message: 'Saída registrada com sucesso', statusCode: HttpStatus.CREATED }
     } catch (error) {
       throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT)
