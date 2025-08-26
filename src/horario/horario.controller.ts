@@ -23,7 +23,7 @@ export class HorarioController {
   }
 
   @Patch("editar")
-  async editart(@Body() updateHorarioDto: UpdateHorarioDto, @Res() res: Response) {
+  async editar(@Body() updateHorarioDto: UpdateHorarioDto, @Res() res: Response) {
     const horario = await this.horarioService.editarHorarios(updateHorarioDto)
     return res.status(horario.statusCode).json(horario)
   }
