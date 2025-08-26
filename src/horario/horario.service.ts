@@ -4,10 +4,10 @@ import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { historico, IHistorico } from 'src/interfaces/historico';
 import { IMessage } from 'src/interfaces/message.type';
-import { IHorariosOne } from 'src/interfaces/horariosOne';
-import { IHorariosAll } from 'src/interfaces/horariosAll';
+import { IHorariosOne } from 'src/interfaces/horarios/horariosOne';
+import { IHorariosAll } from 'src/interfaces/horarios/horariosAll';
 import { toZonedTime } from "date-fns-tz"
-import { HorarioDoDia } from 'src/interfaces/horarioDoDia';
+import { HorarioDoDia } from 'src/interfaces/horarios/horarioDoDia';
 
 @Injectable()
 export class HorarioService {
@@ -98,6 +98,11 @@ export class HorarioService {
           ],
         },
       });
+      console.log(horarios);
+      
+      if (!horarios) {
+        throw (`Entrada não foi registrada ainda`)
+      }
 
       if (horarios.saida) {
         throw (`Saida já foi registrada no sistema`)
@@ -120,7 +125,7 @@ export class HorarioService {
     }
   }
 
-  async getHorarioDia(): Promise<HorarioDoDia> {
+  async getHorarioDia(): Promise<HorarioDoDia>{
     try {
       const date = new Date()
       const dataLocal = toZonedTime(date, this.fusoHorario)
@@ -128,7 +133,7 @@ export class HorarioService {
       inicioDoDia.setHours(0, 0, 0, 0);
       const fimDoDia = new Date(dataLocal);
       fimDoDia.setHours(23, 59, 59, 999);
-      const dados = await this.prisma.horarios.findFirst({
+      const horarios = await this.prisma.horarios.findMany({
         where: {
           dataCriado: {
             gte: inicioDoDia,
@@ -139,26 +144,91 @@ export class HorarioService {
           entrada:true, saida:true,
           funcionarios:{
             select:{
-              nome:true, matricula:true, cargo:true, id:true
+              id:true
             }
           }
         }
       })
+      
+      const dados = await this.prisma.funcionarios.findMany({where:{adm:false}})
+      
       if(!dados){
-        return {funcionarios:null, entrada:null, saida:null, statusCode:HttpStatus.FOUND}
+        return {message:"Sem nenhum registro na tabela funcionários", statusCode:HttpStatus.NOT_FOUND}
       }
-      
-      const funcionarios = dados.funcionarios
-      console.log(dados);
-      
-      const entrada = `${dados.entrada.getHours()}:${dados.entrada.getMinutes() < 10? "0" + dados.entrada.getMinutes() : dados.entrada.getMinutes()}`
-     
-      const saida = dados.saida ? `${dados.saida.getHours()}:${dados.saida.getMinutes() < 10? "0" + dados.saida.getMinutes() : dados.saida.getMinutes()}` : null      
-      
-      return {funcionarios,  saida, entrada, statusCode: HttpStatus.FOUND}
+      var funcionarios = []
+      dados.forEach(element => {
+        const {cargo, matricula, nome, id} = element
+        funcionarios.push({
+          nome, cargo, matricula, id, entrada:null, saida:null
+        })
+      });
+      if(!horarios){
+        return {funcionarios, statusCode:HttpStatus.FOUND}
+      }
+
+      horarios.forEach(horario => {
+        const {id} = horario.funcionarios
+        const entrada = `${horario.entrada.getHours()}:${horario.entrada.getMinutes() < 10? "0" + horario.entrada.getMinutes() : horario.entrada.getMinutes()}`
+        const saida = horario.saida ? `${horario.saida.getHours()}:${horario.saida.getMinutes() < 10? "0" + horario.saida.getMinutes() : horario.saida.getMinutes()}` : null      
+        funcionarios.forEach(funcionario => {
+          if(funcionario.id === id){
+            funcionario.entrada = entrada
+            funcionario.saida = saida
+          }
+        });
+      });
+
+      return {funcionarios, statusCode: HttpStatus.FOUND}
+    
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.CONFLICT)
     }
   }
+
+  async editarHorarios(UpdateHorarioDto: UpdateHorarioDto){
+    const dataCriada = new Date(UpdateHorarioDto.dataCriada)
+    console.log(dataCriada, UpdateHorarioDto.dataCriada);
+    const id_funcionario = UpdateHorarioDto.id_funcionario
+    const dataLocal = toZonedTime(dataCriada, this.fusoHorario)
+    const inicioDoDia = new Date(dataLocal);
+    inicioDoDia.setHours(0, 0, 0, 0);
+    const fimDoDia = new Date(dataLocal);
+    fimDoDia.setHours(23, 59, 59, 999);
+
+    const horarios = await this.prisma.horarios.findFirst({where: {
+          AND: [
+            {
+              dataCriado: {
+                gte: inicioDoDia,
+                lt: fimDoDia,
+              },
+            },
+            {
+              id_funcionario,
+            },
+          ],
+        },})
+  
+    if(!horarios){
+      return {message:"Sem registro de horario", statusCode:HttpStatus.NOT_FOUND}
+    }
+    const entrada = !UpdateHorarioDto.entrada ? horarios.entrada : new Date(UpdateHorarioDto.entrada)
+    const saida = !UpdateHorarioDto.saida ? horarios.saida : new Date(UpdateHorarioDto.saida)
+
+    await this.prisma.horarios.updateMany({where: {
+          AND: [
+            {
+              dataCriado: {
+                gte: inicioDoDia,
+                lt: fimDoDia,
+              },
+            },
+            {
+              id_funcionario: id_funcionario,
+            },
+          ],
+        }, data:{entrada, saida}})
+
+      }
 
 }
