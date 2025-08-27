@@ -168,8 +168,8 @@ export class HorarioService {
 
       horarios.forEach(horario => {
         const {id} = horario.funcionarios
-        const entrada = `${horario.entrada.getHours()}:${horario.entrada.getMinutes() < 10? "0" + horario.entrada.getMinutes() : horario.entrada.getMinutes()}`
-        const saida = horario.saida ? `${horario.saida.getHours()}:${horario.saida.getMinutes() < 10? "0" + horario.saida.getMinutes() : horario.saida.getMinutes()}` : null      
+        const entrada = `${horario.entrada.getHours() < 10 ? "0" + horario.entrada.getHours() : horario.entrada.getHours() }:${horario.entrada.getMinutes() < 10? "0" + horario.entrada.getMinutes() : horario.entrada.getMinutes()}`
+        const saida = horario.saida ? `${horario.saida.getHours() < 10 ? "0" + horario.saida.getHours() : horario.saida.getHours()}:${horario.saida.getMinutes() < 10? "0" + horario.saida.getMinutes() : horario.saida.getMinutes()}` : null      
         funcionarios.forEach(funcionario => {
           if(funcionario.id === id){
             funcionario.entrada = entrada
@@ -188,13 +188,10 @@ export class HorarioService {
   async editarHorarios(UpdateHorarioDto: UpdateHorarioDto){
     try {
     const dataCriada = new Date(UpdateHorarioDto.dataCriada)
-    console.log(dataCriada.getDate, dataCriada.getMonth(), dataCriada.getFullYear());
-    console.log(dataCriada, UpdateHorarioDto.dataCriada);
     const id_funcionario = UpdateHorarioDto.id_funcionario
     const dataLocal = toZonedTime(dataCriada, this.fusoHorario)
     const inicioDoDia = new Date(dataLocal.getMonth() + 1 + "/" + dataLocal.getDate() + "/" + dataLocal.getFullYear() + " 00:00:00");
     const fimDoDia = new Date(dataLocal.getMonth() + 1 + "/" + dataLocal.getDate() + "/" + dataLocal.getFullYear() + " 23:59:59");
-    console.log(fimDoDia, inicioDoDia, id_funcionario);
     
    const horarios = await this.prisma.horarios.findFirst({
         where: {
@@ -211,17 +208,19 @@ export class HorarioService {
           ],
         },
       });
-    console.log(horarios);
+    console.log(horarios, UpdateHorarioDto.entrada);
     
     if(!horarios){
-      return {message:"Sem registro de horario", statusCode:HttpStatus.NOT_FOUND}
+      if(!UpdateHorarioDto.entrada){return {message:"Registre horario de entrada primeiro", statusCode:HttpStatus.CONFLICT}}
+      await this.prisma.horarios.create({ data: { dataCriado: dataLocal, entrada: UpdateHorarioDto.entrada, id_funcionario } })
+      return {message:"Horario atualizado com suceso", statusCode:HttpStatus.CREATED}
     }
     
     const entrada = !UpdateHorarioDto.entrada ? horarios.entrada : new Date(UpdateHorarioDto.entrada)
     const saida = !UpdateHorarioDto.saida ? horarios.saida : new Date(UpdateHorarioDto.saida)
 
-    await this.prisma.horarios.updateMany({where: {AND: [ { dataCriado: { gte: inicioDoDia, lt: fimDoDia, }, }, {id_funcionario: id_funcionario,},],}, data:{entrada, saida}})
-      
+    await this.prisma.horarios.updateMany({where: {id:horarios.id}, data:{entrada, saida}})
+      return {message:"Horario atualizado com sucesso", statusCode:HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.CONFLICT)
     }
