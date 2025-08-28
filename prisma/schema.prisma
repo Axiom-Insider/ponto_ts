@@ -35,9 +35,9 @@ model Funcionarios{
 
 model Horarios{
   id Int @id @default(autoincrement())
-  dataCriado DateTime  
-  entrada DateTime
-  saida DateTime? 
+  dataCriado String 
+  entrada String
+  saida String? 
   id_funcionario Int 
   funcionarios  Funcionarios @relation(fields: [id_funcionario], references: [id])
 }
@@ -45,16 +45,16 @@ model Horarios{
 model Feriados{
   id Int @id @default(autoincrement())
   nome String 
-  dataInicio DateTime
-  dataFim DateTime
+  dataInicio String
+  dataFim String
   nacional Boolean 
 }
 
 model Ausencia{
   id Int @id @default(autoincrement())
   tipoAusencia TipoAusencia 
-  dataInicio DateTime
-  dataFim DateTime? 
+  dataInicio String
+  dataFim String? 
   id_funcionario Int
   funcionarios Funcionarios @relation(fields: [id_funcionario], references: [id])
 }

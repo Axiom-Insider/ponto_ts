@@ -5,11 +5,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { IMessage } from 'src/interfaces/message.type';
 import { IGenerico } from 'src/interfaces/dados';
 import { Feriados } from 'src/interfaces/feriados';
+import { toZonedTime } from 'date-fns-tz';
 
 @Injectable()
 export class FeriadosService {
 
-  constructor(private readonly prisma: PrismaService) { }
+  private readonly fusoHorario: string;
+  /*
+  constructor(private readonly prisma: PrismaService) { 
+    this.fusoHorario = "America/Bahia"
+   }
 
   async create(createFeriadoDto: CreateFeriadoDto): Promise<IMessage> {
     try {
@@ -45,6 +50,38 @@ export class FeriadosService {
     }
   }
 
+  async findFeriadosMesAno(id_funcionario:number, mes:number, ano:number){
+      try {
+         const date = new Date()
+              date.setDate(1)
+              date.setMonth(mes - 1)
+              date.setFullYear(ano)
+              const dataLocal = toZonedTime(date, this.fusoHorario)
+              const inicioDoMes = dataLocal;
+              inicioDoMes.setHours(0, 0, 0, 0);
+              const fimDoMes = new Date(dataLocal);
+              fimDoMes.setHours(23, 59, 59, 999);
+              fimDoMes.setDate(31)
+              fimDoMes.setMonth(fimDoMes.getMonth() + 1)
+              fimDoMes.setFullYear(fimDoMes.getFullYear())
+              
+              const dadosFeriados = await this.prisma.feriados.findMany({where: { nacional:false,
+                    dataInicio:{gte:inicioDoMes, lt:fimDoMes},
+                    dataFim:{gte:inicioDoMes, lt:fimDoMes} 
+                  }})
+              inicioDoMes.setFullYear(0)
+              const dadosFeriadosNacional = await this.prisma.feriados.findMany({where:{
+                nacional:true,
+                dataInicio:{gte:inicioDoMes, lt:fimDoMes}, 
+                dataFim:{gte:inicioDoMes, lt:fimDoMes}
+              }})
+              
+              return {dadosFeriados, dadosFeriadosNacional}
+      } catch (error) {
+        throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
+      }
+    }
+
   async update(id: number, updateFeriadoDto: UpdateFeriadoDto) {
     try {
       await this.prisma.feriados.update({
@@ -65,4 +102,5 @@ export class FeriadosService {
       throw new HttpException(`Erro ao deletar feriado: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
-}
+*/
+  }

@@ -9,12 +9,14 @@ import { IHorariosAll } from 'src/interfaces/horarios/horariosAll';
 import { toZonedTime } from "date-fns-tz"
 import { HorarioDoDia } from 'src/interfaces/horarios/horarioDoDia';
 import { stat } from 'fs';
+import { AusenciaService } from 'src/ausencia/ausencia.service';
+import { FeriadosService } from 'src/feriados/feriados.service';
 
 @Injectable()
 export class HorarioService {
   private readonly fusoHorario: string;
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(private readonly prisma: PrismaService, private readonly ausencias:AusenciaService, private readonly feriados: FeriadosService) {
     this.fusoHorario = "America/Bahia"
   }
 
@@ -315,7 +317,12 @@ export class HorarioService {
       if(!horarios[0]){
          throw ('Nenhum registro de horário encontrado para o funcionário no mês e ano informados')
       }
+      console.log(mes);
+      const ausencias = await this.ausencias.findAusenciaMesAno(id_funcionario, mes, ano)
+      const feriados = await this.feriados.findFeriadosMesAno(id_funcionario, mes, ano)
+      const qntDiasMes = new Date(ano, mes, 0).getDate();
 
+      console.log(ausencias, feriados, qntDiasMes);
       
 
       return {historico:[] , message:"", statusCode: HttpStatus.FOUND }

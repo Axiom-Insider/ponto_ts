@@ -4,7 +4,7 @@ import { CreateFeriadoDto } from './dto/create-feriado.dto';
 import { UpdateFeriadoDto } from './dto/update-feriado.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 
-@UseGuards(AuthGuard)
+
 @Controller('feriados')
 export class FeriadosController {
   constructor(private readonly feriadosService: FeriadosService) {}
