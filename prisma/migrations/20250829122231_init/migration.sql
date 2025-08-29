@@ -6,6 +6,7 @@ CREATE TABLE `Funcionarios` (
     `matricula` INTEGER NOT NULL,
     `nome` VARCHAR(191) NOT NULL,
     `cargo` VARCHAR(191) NOT NULL,
+    `empresa` VARCHAR(191) NOT NULL,
     `senha` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Funcionarios_matricula_key`(`matricula`),
@@ -15,12 +16,9 @@ CREATE TABLE `Funcionarios` (
 -- CreateTable
 CREATE TABLE `Horarios` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `dataCriado` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `data` VARCHAR(191) NOT NULL,
-    `entrada` BOOLEAN NOT NULL DEFAULT true,
-    `saida` BOOLEAN NOT NULL DEFAULT false,
-    `hora_entrada` VARCHAR(191) NOT NULL,
-    `hora_saida` VARCHAR(191) NULL,
+    `dataCriado` VARCHAR(191) NOT NULL,
+    `entrada` VARCHAR(191) NOT NULL,
+    `saida` VARCHAR(191) NULL,
     `id_funcionario` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -30,8 +28,8 @@ CREATE TABLE `Horarios` (
 CREATE TABLE `Feriados` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `nome` VARCHAR(191) NOT NULL,
-    `data` VARCHAR(191) NOT NULL,
-    `dataSec` VARCHAR(191) NOT NULL,
+    `dataInicio` VARCHAR(191) NOT NULL,
+    `dataFim` VARCHAR(191) NOT NULL,
     `nacional` BOOLEAN NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -40,10 +38,9 @@ CREATE TABLE `Feriados` (
 -- CreateTable
 CREATE TABLE `Ausencia` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `ferias` BOOLEAN NOT NULL,
-    `atestado` BOOLEAN NOT NULL,
-    `data_entrada` VARCHAR(191) NOT NULL,
-    `data_saida` VARCHAR(191) NOT NULL,
+    `tipoAusencia` ENUM('FERIAS', 'ATESTADO', 'LICENCA', 'OUTRO') NOT NULL,
+    `dataInicio` VARCHAR(191) NOT NULL,
+    `dataFim` VARCHAR(191) NULL,
     `id_funcionario` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)

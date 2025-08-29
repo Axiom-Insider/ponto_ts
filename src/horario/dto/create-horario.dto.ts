@@ -12,7 +12,7 @@ export class CreateHorarioDto {
 
     @IsString()
     @IsOptional()
-    dataCriada?:string;
+    dataCriado?:string;
 
     @IsOptional()
     @IsDateString()

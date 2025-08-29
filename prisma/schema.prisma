@@ -46,7 +46,7 @@ model Feriados{
   id Int @id @default(autoincrement())
   nome String 
   dataInicio String
-  dataFim String
+  dataFim String?
   nacional Boolean 
 }
 

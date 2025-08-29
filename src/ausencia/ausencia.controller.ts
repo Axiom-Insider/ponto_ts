@@ -6,7 +6,7 @@ import { UpdateAusenciaDto } from './dto/update-ausencia.dto';
 @Controller('ausencia')
 export class AusenciaController {
   constructor(private readonly ausenciaService: AusenciaService) {}
-
+  /*
   @Post()
   create(@Body() createAusenciaDto: CreateAusenciaDto) {
     return this.ausenciaService.create(createAusenciaDto);
@@ -31,4 +31,5 @@ export class AusenciaController {
   remove(@Param('id') id: string) {
     return this.ausenciaService.remove(+id);
   }
+    */
 }

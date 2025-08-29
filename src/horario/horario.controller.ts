@@ -15,35 +15,35 @@ export class HorarioController {
     const horario = await this.horarioService.registrarEntrada(createHorarioDto)
     return res.status(horario.statusCode).json(horario)
   }
-
   @Post('saida')
   async createSaida(@Body() createHorarioDto: CreateHorarioDto, @Res() res: Response) {
     const horario = await this.horarioService.registrarSaida(createHorarioDto)
     return res.status(horario.statusCode).json(horario)
-  }
-
-  @Patch("editar")
-  async editar(@Body() updateHorarioDto: UpdateHorarioDto, @Res() res: Response) {
-    const horario = await this.horarioService.editarHorarios(updateHorarioDto)
-    return res.status(horario.statusCode).json(horario)
-  }
-
-  @Get('dia')
-  async getAll(@Res() res: Response){
-    const horario = await this.horarioService.getHorarioDia()
-    return res.status(horario.statusCode).json(horario)    
-  }
-
-  @Get("/verificar/:id_funcionario")
-  async verificarRegistroHoje(@Param("id_funcionario") id_funcionario: string, @Res() res: Response){
-    const horario = await this.horarioService.verificarHorarioDoFuncionario(parseInt(id_funcionario))
-    return res.status(horario.statusCode).json(horario)    
-  }
+    }
+    
+    @Get('dia')
+    async getAll(@Res() res: Response){
+      const horario = await this.horarioService.getHorarioDia()
+      return res.status(horario.statusCode).json(horario)    
+    }
+   
+    @Patch("editar")
+    async editar(@Body() updateHorarioDto: UpdateHorarioDto, @Res() res: Response) {
+      const horario = await this.horarioService.editarHorarios(updateHorarioDto)
+      return res.status(horario.statusCode).json(horario)
+      }
+      
+      @Get("/verificar/:id_funcionario")
+      async verificarRegistroHoje(@Param("id_funcionario") id_funcionario: string, @Res() res: Response){
+        const horario = await this.horarioService.verificarHorarioDoFuncionario(parseInt(id_funcionario))
+        return res.status(horario.statusCode).json(horario)    
+        }
+  /*
 
    @Get("/historico/:id_funcionario/:mes/:ano")
   async getHistoricoFuncionario(@Param("id_funcionario") id_funcionario: string, @Param("mes") mes: string, @Param("ano") ano: string, @Res() res: Response){
     const horario = await this.horarioService.getHistoricoFuncionario(parseInt(id_funcionario), parseInt(mes), parseInt(ano))
     return res.status(horario.statusCode).json(horario)    
   }
-
+*/
 }

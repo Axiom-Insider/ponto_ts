@@ -8,21 +8,25 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('feriados')
 export class FeriadosController {
   constructor(private readonly feriadosService: FeriadosService) {}
-
+  
   @Post()
     create(@Body() createFeriadoDto: CreateFeriadoDto) {
-      return this.feriadosService.create(createFeriadoDto)
-  }
-
+    return this.feriadosService.create(createFeriadoDto)
+    }
+    
   @Get()
-  findAll() {
+    findAll() {
     return this.feriadosService.findAll()  
-}
-
+    }
+  
   @Get(':id')
    findOne(@Param('id') id: string) {
       return this.feriadosService.findOne(+id)
     }
+  @Get("/ano/:ano")
+  findAno(@Param("ano") ano:string){
+    return this.feriadosService.findAno(+ano)
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateFeriadoDto: UpdateFeriadoDto) {
@@ -33,4 +37,5 @@ export class FeriadosController {
    remove(@Param('id') id: string) {
     return this.feriadosService.remove(+id);
   }
+    
 }

@@ -11,14 +11,18 @@ import { toZonedTime } from 'date-fns-tz';
 export class FeriadosService {
 
   private readonly fusoHorario: string;
-  /*
+
   constructor(private readonly prisma: PrismaService) { 
     this.fusoHorario = "America/Bahia"
    }
 
   async create(createFeriadoDto: CreateFeriadoDto): Promise<IMessage> {
     try {
-      await this.prisma.feriados.create({ data: createFeriadoDto })
+      const { nome, nacional } = createFeriadoDto
+      const dataInicio = new Date(createFeriadoDto.dataInicio).toISOString().split("T")[0]
+      const dataFim = new Date(createFeriadoDto.dataFim).toISOString().split("T")[0]
+
+      await this.prisma.feriados.create({ data:{dataInicio, dataFim, nome, nacional}})
       return { message: 'Feriado criado com sucesso', statusCode: HttpStatus.CREATED}
     } catch (error) {
             throw new HttpException(`Erro ao registrar feriado ${error.message}`, HttpStatus.CONFLICT)
@@ -32,7 +36,42 @@ export class FeriadosService {
       if(!dados || dados.length === 0){
         throw new HttpException('Nenhum feriado encontrado', HttpStatus.NOT_FOUND)
        }
+      dados.forEach(element => {
+        const {dataInicio, dataFim} = element
+        const tempI = dataInicio.split("-")
+        const tempF = dataFim.split("-")
+        element.dataInicio = `${tempI[2]}/${tempI[1]}/${tempI[0]}`
+        element.dataFim = `${tempF[2]}/${tempF[1]}/${tempF[0]}`
+      });
       return {dados, statusCode:HttpStatus.OK}
+    } catch (error) {
+      throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
+    }
+  }
+  async findAno(ano:number):Promise<any>{
+    try {
+      const feriadosSem = []
+      const dadosFeriados = await this.prisma.feriados.findMany({where:{nacional:false}})
+
+      dadosFeriados.forEach(element => {
+        const anoInicio = element.dataInicio.split("-")[0]
+        if(ano === +anoInicio){
+        const {dataInicio, dataFim} = element
+        const tempI = dataInicio.split("-")
+        const tempF = dataFim.split("-")
+        element.dataInicio = `${tempI[2]}/${tempI[1]}/${tempI[0]}`
+        element.dataFim = `${tempF[2]}/${tempF[1]}/${tempF[0]}`
+        feriadosSem.push({
+              id:element.id,
+              dataInicio:`${tempI[2]}/${tempI[1]}/${tempI[0]}`,
+              dataFim:`${tempF[2]}/${tempF[1]}/${tempF[0]}`,
+              nacional:element.nacional,
+              nome:element.nome
+          })
+        }
+      })
+
+      return{feriadosSem, statusCode:HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
@@ -49,7 +88,7 @@ export class FeriadosService {
       throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
-
+/*
   async findFeriadosMesAno(id_funcionario:number, mes:number, ano:number){
       try {
          const date = new Date()
@@ -81,7 +120,7 @@ export class FeriadosService {
         throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
       }
     }
-
+*/
   async update(id: number, updateFeriadoDto: UpdateFeriadoDto) {
     try {
       await this.prisma.feriados.update({
@@ -102,5 +141,5 @@ export class FeriadosService {
       throw new HttpException(`Erro ao deletar feriado: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
-*/
+
   }
