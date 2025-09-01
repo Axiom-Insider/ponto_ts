@@ -52,7 +52,7 @@ export class FeriadosService {
     try {
       const feriadosSem = []
       const dadosFeriados = await this.prisma.feriados.findMany({where:{nacional:false}})
-
+      const dadosFeriadosPerm = await this.prisma.feriados.findMany({where:{nacional:true}})
       dadosFeriados.forEach(element => {
         const anoInicio = element.dataInicio.split("-")[0]
         if(ano === +anoInicio){
@@ -71,7 +71,7 @@ export class FeriadosService {
         }
       })
 
-      return{feriadosSem, statusCode:HttpStatus.OK}
+      return{feriadosSem, dadosFeriadosPerm, statusCode:HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
