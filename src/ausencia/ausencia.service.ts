@@ -14,17 +14,21 @@ export class AusenciaService {
   constructor(private readonly prisma: PrismaService) {
     this.fusoHorario = "America/Bahia"
   }
-/*
-  async create(createAusenciaDto: CreateAusenciaDto): Promise<IMessage | HttpException>  {
+
+  async create(createAusenciaDto: CreateAusenciaDto): Promise<{}>  {
       try {
-        await this.prisma.ausencia.create({ data: createAusenciaDto })
+        const { id_funcionario, tipoAusencia } = createAusenciaDto
+        const dataInicio = new Date(createAusenciaDto.dataInicio).toISOString().split("T")[0]
+        const dataFim = new Date(createAusenciaDto.dataFim).toISOString().split("T")[0]
+
+        await this.prisma.ausencia.create({ data:{dataInicio, dataFim, id_funcionario, tipoAusencia} })
         return { message: 'Ausência criada com sucesso', statusCode: HttpStatus.CREATED}
       } catch (error) {
         throw new HttpException(`Erro ao registrar ausência ${error.message}`, HttpStatus.CONFLICT)
       }
   }
 
-  async findAll(): Promise<IGenerico<Ausencia[]> | HttpException> {
+  async findAll(): Promise<{}> {
       try {
         const dados = await this.prisma.ausencia.findMany()
         return {dados, statusCode: HttpStatus.CREATED}
@@ -33,10 +37,21 @@ export class AusenciaService {
       }
   }
 
-  async findOne(id_funcionario: number):Promise<IGenerico<Ausencia[]> | HttpException> {
+  async findOne(id_funcionario: number):Promise<{}> {
     try {
-      const dados = await this.prisma.ausencia.findMany({ where: { id_funcionario } })
-      return {dados, statusCode: HttpStatus.FOUND}
+      const dadosAusencia = await this.prisma.ausencia.findMany({ where: { id_funcionario } })
+      const ausencia = []
+      for (let index = 0; index < dadosAusencia.length; index++) {
+        const {dataInicio, dataFim, tipoAusencia} = dadosAusencia[index]
+        const tempInicio = dataInicio.split("-")
+        const tempFim = dataFim.split("-")
+        ausencia.push({
+          dataInicio:`${tempInicio[2]}/${tempInicio[1]}${tempInicio[0]}`,
+          dataFIm:`${tempFim[2]}/${tempFim[1]}${tempFim[0]}`,
+          tipoAusencia
+        })
+      }
+      return {ausencia, statusCode: HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao registrar ausência ${error.message}`, HttpStatus.CONFLICT)
     }
@@ -44,26 +59,7 @@ export class AusenciaService {
 
   async findAusenciaMesAno(id_funcionario:number, mes:number, ano:number){
     try {
-       const date = new Date()
-            date.setDate(1)
-            date.setMonth(mes - 1)
-            date.setFullYear(ano)
-            const dataLocal = toZonedTime(date, this.fusoHorario)
-            const inicioDoMes = dataLocal;
-            inicioDoMes.setHours(0, 0, 0, 0);
-            const fimDoMes = new Date(dataLocal);
-            fimDoMes.setHours(23, 59, 59, 999);
-            fimDoMes.setDate(31)
-            fimDoMes.setMonth(fimDoMes.getMonth() + 1)
-            fimDoMes.setFullYear(fimDoMes.getFullYear())
-            const dadosAusencia = await this.prisma.ausencia.findMany({
-              where:{
-                  id_funcionario,
-                  dataInicio:{gte:inicioDoMes, lt:fimDoMes},
-                  dataFim:{gte:inicioDoMes, lt:fimDoMes}
-              }})
-
-            return dadosAusencia
+       
     } catch (error) {
       throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
     }
@@ -86,5 +82,5 @@ export class AusenciaService {
         throw new HttpException(`Erro ao deletar ausência ${error.message}`, HttpStatus.CONFLICT)
       }
   }
-*/
+
   }

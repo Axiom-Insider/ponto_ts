@@ -88,39 +88,56 @@ export class FeriadosService {
       throw new HttpException(`Erro ao consultar tabela feriados: ${error.message}`, HttpStatus.NOT_FOUND)
     }
   }
-/*
-  async findFeriadosMesAno(id_funcionario:number, mes:number, ano:number){
+  
+  async findMesAno(mes:number, ano:number){
       try {
-         const date = new Date()
-              date.setDate(1)
-              date.setMonth(mes - 1)
-              date.setFullYear(ano)
-              const dataLocal = toZonedTime(date, this.fusoHorario)
-              const inicioDoMes = dataLocal;
-              inicioDoMes.setHours(0, 0, 0, 0);
-              const fimDoMes = new Date(dataLocal);
-              fimDoMes.setHours(23, 59, 59, 999);
-              fimDoMes.setDate(31)
-              fimDoMes.setMonth(fimDoMes.getMonth() + 1)
-              fimDoMes.setFullYear(fimDoMes.getFullYear())
-              
-              const dadosFeriados = await this.prisma.feriados.findMany({where: { nacional:false,
-                    dataInicio:{gte:inicioDoMes, lt:fimDoMes},
-                    dataFim:{gte:inicioDoMes, lt:fimDoMes} 
-                  }})
-              inicioDoMes.setFullYear(0)
-              const dadosFeriadosNacional = await this.prisma.feriados.findMany({where:{
-                nacional:true,
-                dataInicio:{gte:inicioDoMes, lt:fimDoMes}, 
-                dataFim:{gte:inicioDoMes, lt:fimDoMes}
-              }})
-              
-              return {dadosFeriados, dadosFeriadosNacional}
+         const dadosFeriados = await this.prisma.feriados.findMany({where:{nacional:false}})
+         const dadosFeriadosPerm = await this.prisma.feriados.findMany({where:{nacional:true}})
+         const feriadosDoMes = []
+          for (let index = 0; index < dadosFeriados.length; index++) {
+          const {nome, dataInicio, dataFim} = dadosFeriados[index]
+          const tempAno = dataInicio.split("-")[0];
+          const tempMes = dataInicio.split("-")[1];
+          if(ano === +tempAno){
+            if(mes === +tempMes){
+              feriadosDoMes.push({
+                nome, dataInicio, dataFim
+              })
+              continue;
+            }
+          }
+          const tempAnoFim = dataFim.split("-")[0];
+          const tempMesFim = dataFim.split("-")[1];
+          if(ano === +tempAnoFim){
+            if(mes === +tempMesFim){
+              feriadosDoMes.push({
+                nome, dataInicio, dataFim
+              })
+            }
+          }
+         }
+          for(let index = 0; index < dadosFeriadosPerm.length; index++){
+          const {nome, dataInicio, dataFim} = dadosFeriadosPerm[index];
+          const tempMes = dataInicio.split('-')[1]
+          if(mes === +tempMes){
+            feriadosDoMes.push({
+              nome, dataInicio, dataFim
+            })
+            continue;
+          }
+          const temMesFim = dataInicio.split("-")[1]
+          if(mes === +temMesFim){
+            feriadosDoMes.push({nome, dataInicio, dataFim})
+          }
+        }
+
+         console.log(feriadosDoMes);
+         return{feriadosDoMes}
       } catch (error) {
         throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
       }
     }
-*/
+
   async update(id: number, updateFeriadoDto: UpdateFeriadoDto) {
     try {
       await this.prisma.feriados.update({

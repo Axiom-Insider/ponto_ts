@@ -23,9 +23,15 @@ export class FeriadosController {
    findOne(@Param('id') id: string) {
       return this.feriadosService.findOne(+id)
     }
+    
   @Get("/ano/:ano")
   findAno(@Param("ano") ano:string){
     return this.feriadosService.findAno(+ano)
+  }
+
+  @Get("/teste/:mes/:ano")
+  teste(@Param("ano") ano:string, @Param("mes") mes:string){
+    return this.feriadosService.findMesAno(+mes, +ano)
   }
 
   @Patch(':id')

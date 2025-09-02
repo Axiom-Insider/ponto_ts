@@ -6,7 +6,7 @@ import { UpdateAusenciaDto } from './dto/update-ausencia.dto';
 @Controller('ausencia')
 export class AusenciaController {
   constructor(private readonly ausenciaService: AusenciaService) {}
-  /*
+  
   @Post()
   create(@Body() createAusenciaDto: CreateAusenciaDto) {
     return this.ausenciaService.create(createAusenciaDto);
@@ -17,9 +17,9 @@ export class AusenciaController {
     return this.ausenciaService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ausenciaService.findOne(+id);
+  @Get(':id_funcionario')
+  findOne(@Param('id_funcionario') id_funcionario: string) {
+    return this.ausenciaService.findOne(+id_funcionario);
   }
 
   @Patch(':id')
@@ -31,5 +31,5 @@ export class AusenciaController {
   remove(@Param('id') id: string) {
     return this.ausenciaService.remove(+id);
   }
-    */
+    
 }
