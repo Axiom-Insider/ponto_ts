@@ -57,9 +57,35 @@ export class AusenciaService {
     }
   }
 
-  async findAusenciaMesAno(id_funcionario:number, mes:number, ano:number){
+  async findMesAno(id_funcionario:number, mes:number, ano:number){
     try {
-       
+      const dadosAusencia = await this.prisma.ausencia.findMany()
+      const ausencia = []
+      for(let index = 0; index < dadosAusencia.length; index++){
+        const {dataInicio, dataFim, tipoAusencia} = dadosAusencia[index]
+        const tempAnoInicio = dataInicio.split("-")[0]
+        const tempMesInicio = dataInicio.split("-")[1]
+        if(ano === +tempAnoInicio){
+          if(mes === +tempMesInicio){
+            ausencia.push({
+              tipoAusencia, dataInicio, dataFim
+            })
+            continue;
+          }
+        }
+        const tempAnoFim = dataFim.split("-")[0]
+        const tempMesFim = dataFim.split("-")[1]
+        if(ano === +tempAnoFim){
+          if(mes === +tempMesFim){
+            ausencia.push({
+              tipoAusencia, dataInicio, dataFim
+            })
+            continue;
+          }
+        }
+      }
+
+      return ausencia 
     } catch (error) {
       throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
     }

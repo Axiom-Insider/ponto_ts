@@ -131,8 +131,7 @@ export class FeriadosService {
           }
         }
 
-         console.log(feriadosDoMes);
-         return{feriadosDoMes}
+         return feriadosDoMes
       } catch (error) {
         throw new HttpException(`Erro ao consultar a tabela ausência ${error.message}`, HttpStatus.CONFLICT)
       }

@@ -188,52 +188,70 @@ export class HorarioService {
     }
   }
 
-  /*
-  async getHistoricoFuncionario(id_funcionario: number, mes: number, ano: number): Promise<{historico:[] ,message:string, statusCode: number }> {
+  
+  async getHistoricoFuncionario(id_funcionario: number, mes: number, ano: number): Promise<{historico:{},statusCode:number}> {
     try {
-      const date = new Date()
-      date.setDate(1)
-      date.setMonth(mes - 1)
-      date.setFullYear(ano)
-      const dataLocal = toZonedTime(date, this.fusoHorario)
-      const inicioDoMes = dataLocal;
-      inicioDoMes.setHours(0, 0, 0, 0);
-      const fimDoMes = new Date(dataLocal);
-      fimDoMes.setHours(23, 59, 59, 999);
-      fimDoMes.setDate(31)
-      fimDoMes.setMonth(fimDoMes.getMonth() + 1)
-      fimDoMes.setFullYear(fimDoMes.getFullYear())
-      console.log(inicioDoMes, fimDoMes, dataLocal);
+      const ausencias = await this.ausencias.findMesAno(id_funcionario, mes, ano)
+      const feriados = await this.feriados.findMesAno(mes, ano)
+      const horarios = await this.prisma.horarios.findMany({where:{id_funcionario}})
+      const qntDia = new Date(ano, mes, 0).getDate()
+      const historico = []
+
+
+      for(let index = 1; index <= qntDia; index++){
+        historico.push({ dia:index ,nomeDia:this.nomeDia(ano, mes, index), entrada:null, saida:null, ausencias:null, feriados:null})
+      }
       
-      const dadosFuncionario = await this.prisma.funcionarios.findUnique({
-        where: { id: id_funcionario }, include: {
-          horarios: {
-            where: {
-              dataCriado: {
-                gte: inicioDoMes,
-                lt: fimDoMes,
-              },
-            },
+      if(horarios){
+        historico.forEach(dadosHisotrico=>{
+        horarios.forEach(dadosHorarios=>{
+          const {dataCriado, entrada, saida, id} = dadosHorarios
+          const anoH = dataCriado.split('-')[0]
+          const mesH = dataCriado.split('-')[1]
+          if(ano === +anoH){
+            if(mes === +mesH){
+              const dia = dataCriado.split("-")[2]
+            if(dadosHisotrico.dia === +dia){
+              dadosHisotrico.id = id
+              dadosHisotrico.entrada = entrada
+              dadosHisotrico.saida = saida
+              }
+            }
+          }
+        })
+        
+      })
+      }
+      if(ausencias){
+          ausencias.forEach(element => {
+        const { dataInicio, dataFim, tipoAusencia } = element
+        const diaInicio = +dataInicio.split("-")[2]
+        const diaFim = +dataFim.split("-")[2]
+        const qnt = diaFim - diaInicio
+        console.log(qnt, dataFim, dataInicio, diaFim, diaInicio);
+        if(qnt < 1){
+          historico.forEach(dadosHistorico=>{
+            if(diaInicio === dadosHistorico.dia){
+              dadosHistorico.entrada = null
+              dadosHistorico.saida = null
+              dadosHistorico.ausencias = tipoAusencia
+              dadosHistorico.id = null
+            }
+          })
+        }else{
+          let novoDataInicio = diaInicio - 1
+          console.log(novoDataInicio, dataFim);
+          for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+            historico[novoDataInicio].entrada = null
+            historico[novoDataInicio].saida = null
+            historico[novoDataInicio].ausencias = tipoAusencia
+            historico[novoDataInicio].id = null 
           }
         }
-      })
-      
-      if(!dadosFuncionario){
-         throw ('Nenhum funcionário encontrado com o ID informado')
+     });
       }
-      const { horarios } = dadosFuncionario
-      if(!horarios[0]){
-         throw ('Nenhum registro de horário encontrado para o funcionário no mês e ano informados')
-      }
-      console.log(mes);
-      const ausencias = await this.ausencias.findAusenciaMesAno(id_funcionario, mes, ano)
-      const feriados = await this.feriados.findFeriadosMesAno(id_funcionario, mes, ano)
-      const qntDiasMes = new Date(ano, mes, 0).getDate();
-
-      console.log(ausencias, feriados, qntDiasMes);
-      
-
-      return {historico:[] , message:"", statusCode: HttpStatus.FOUND }
+   
+      return {historico, statusCode: HttpStatus.FOUND }
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.NOT_FOUND)
 
@@ -241,5 +259,5 @@ export class HorarioService {
 
 
   }
-*/
+
 }
