@@ -15,14 +15,6 @@ export class FuncionarioService {
   constructor(private readonly prisma: PrismaService) { }
 
 
-  async horariosDia(funcionarioHorario: FuncionarioHorarioDto){
-    try {
-      const funcionario = await this.prisma.funcionarios.findMany()
-    } catch (error) {
-      
-    }
-  }
-
   async create(createFuncionarioDto: CreateFuncionarioDto) {
     try {
       const found = await this.prisma.funcionarios.findMany({

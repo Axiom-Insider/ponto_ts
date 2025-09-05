@@ -1,142 +1,54 @@
-import { Injectable } from '@nestjs/common';
-import puppeteer from 'puppeteer';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as path from 'path';
+import * as fs from "fs";
+import PizZip from "pizzip";
+import Docxtemplater from "docxtemplater";
 
 
 @Injectable()
 export class DocumentoService {
 
     async criar(){
-        const browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-      
-        await page.setContent(`
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folha de Frequência</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            line-height: 1.6;
+        try {
+        const nome = "Francisco Martins Gonçalves Gomes"
+        const dia = 1
+        const entrada = "09:02"
+        const saida = "13:05"
+        const user = [{nome, dia, entrada, saida}, {nome, dia, entrada, saida}, {nome, dia, entrada, saida}]
+        const filePath = path.join(__dirname, '..','documento', 'pdfs', 'folhaDePontoPoloUAB.docx')
+        const content = fs.readFileSync(filePath, "binary");
+
+    // 2. Carregar no PizZip
+    const zip = new PizZip(content);
+
+    // 3. Criar instância do Docxtemplater
+    const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+    });
+
+    // 4. Definir os dados que vão substituir os placeholders
+    doc.render({
+        user:user,
+        matricula:"934.829.843",
+        nome: "Francisco Martins Gonçalves Gomes",
+        cargo: "Servente (Auxiliar de Serviços Gerais)",
+        data: "05/09/2025",
+    });
+
+    // 5. Gerar o documento final
+    const buffer = doc.getZip().generate({
+        type: "nodebuffer",
+        compression: "DEFLATE",
+    });
+
+    // 6. Salvar o arquivo
+    fs.writeFileSync("documentos/saida.docx", buffer);
+
+    console.log("Documento gerado com sucesso!");   
+        } catch (error) {
+            throw new HttpException(`Erro ao consultar tabela funcionário: ${error}`, HttpStatus.NOT_FOUND)
         }
-        h1 {
-            text-align: center;
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        .header-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-        .header-info div {
-            width: 48%;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            margin-top: 30px;
-        }
-        .underline {
-            border-bottom: 1px solid #000;
-            display: inline-block;
-            min-width: 150px;
-        }
-    </style>
-</head>
-<body>
-    <h1>FOLHA DE FREQUÊNCIA</h1>
-    
-    <div class="header-info">
-        <div>
-            MÊS: <span class="underline"></span><br>
-            NOME: <span class="underline"></span><br>
-            CADASTRO: <span class="underline"></span><br>
-        </div>
-        <div>
-            CARGO / FUNÇÃO: <span class="underline"></span><br>
-            CARGA HORÁRIA: 40 hs
-        </div>
-    </div>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>PRESENÇAS</th>
-                <th>FALTAS</th>
-                <th>DIAS TRABALHADOS</th>
-                <th>OBSERVAÇÃO</th>
-                <th>ASSINATURA E CARIMBO DA COORDENADORA</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td colspan="5" style="text-align: center; font-weight: bold;">BRASIL</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        </tbody>
-    </table>
-    
-    <div class="footer">
-        Polo UAB Juraziro-BA. | Rua Agostinho Muniz, nº. 1010 - A. Bairro São Geraldo. Juraziro / Bahia – Brasil.<br>
-        CEP: 48905-740. Tel.: (74) 3613-2144<br>
-        E-mail: polooubjuraziroba@gmail.com<br>
-        BLOG: polooubjuraziroba.blogspot.com.br<br>
-        FAMPAGE: Polo UAB Juraziro – BA
-    </div>
-</body>
-</html>
-        `);
-      
-        await page.pdf({ path: "./src/documento/pdfs/output_puppeteer.pdf", format: "A4" });
-      
-        await browser.close();
-        console.log("PDF gerado com sucesso!");
-    return 'ola mundo'
 }
 
     baixar(){

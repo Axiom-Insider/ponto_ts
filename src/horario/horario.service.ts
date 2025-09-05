@@ -227,31 +227,43 @@ export class HorarioService {
         const { dataInicio, dataFim, tipoAusencia } = element
         const diaInicio = +dataInicio.split("-")[2]
         const diaFim = +dataFim.split("-")[2]
-        const qnt = diaFim - diaInicio
-        console.log(qnt, dataFim, dataInicio, diaFim, diaInicio);
+        var qnt = diaFim - diaInicio
         if(qnt < 1){
           historico.forEach(dadosHistorico=>{
             if(diaInicio === dadosHistorico.dia){
-              dadosHistorico.entrada = null
-              dadosHistorico.saida = null
               dadosHistorico.ausencias = tipoAusencia
-              dadosHistorico.id = null
             }
           })
         }else{
           let novoDataInicio = diaInicio - 1
-          console.log(novoDataInicio, dataFim);
           for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
-            historico[novoDataInicio].entrada = null
-            historico[novoDataInicio].saida = null
             historico[novoDataInicio].ausencias = tipoAusencia
-            historico[novoDataInicio].id = null 
           }
         }
      });
       }
-   
-      return {historico, statusCode: HttpStatus.FOUND }
+
+      if(feriados){
+        feriados.forEach(dadosFeriados=>{
+          const {dataInicio, dataFim, nome} = dadosFeriados
+          const diaInicio = +dataInicio.split("-")[2]
+          const diaFim = +dataFim.split("-")[2]
+          var qnt = diaFim - diaInicio
+          if(qnt < 1){
+            historico.forEach(dadosHistorico=>{
+              if(diaInicio === dadosHistorico.dia){
+                dadosHistorico.feriados = nome
+              }
+            })
+          }else{
+            for(let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++){
+              historico[novoDataInicio].feriados = nome
+            }
+          }  
+        })
+      }
+      console.log(historico);
+      return {historico, statusCode: HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.NOT_FOUND)
 

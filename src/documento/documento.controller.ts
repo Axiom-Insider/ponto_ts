@@ -9,7 +9,6 @@ export class DocumentoController {
 
     @Get()
     async create(){
-      console.log('entrou')
       return this.documentoService.criar()
     }
 
