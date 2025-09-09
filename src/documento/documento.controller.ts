@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { DocumentoService } from './documento.service';
 import { Response} from 'express';
 
@@ -7,9 +7,10 @@ export class DocumentoController {
   constructor(private readonly documentoService: DocumentoService) {  
   }
 
-    @Get()
-    async create(){
-      return this.documentoService.criar()
+    @Get("/:id_funcionario/:mes/:ano")
+    async create(@Param("id_funcionario") id_funcionario: string, @Param("mes") mes: string, @Param("ano") ano: string, @Res() res: Response){
+      const horario = await this.documentoService.criarDocumento(+id_funcionario, +mes, +ano)
+      return 
     }
 
     @Get('baixar')

@@ -3,18 +3,19 @@ import * as path from 'path';
 import * as fs from "fs";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
+import { HorarioService } from 'src/horario/horario.service';
 
 
 @Injectable()
 export class DocumentoService {
 
-    async criar(){
+    constructor(private readonly horariosService:HorarioService) { }
+
+    async criarDocumento(id_funcionario:number, ano:number, mes:number){
         try {
-        const nome = "Francisco Martins Gonçalves Gomes"
-        const dia = 1
-        const entrada = "09:02"
-        const saida = "13:05"
-        const user = [{nome, dia, entrada, saida}, {nome, dia, entrada, saida}, {nome, dia, entrada, saida}]
+        
+        const historico = this.horariosService.getHistoricoFuncionario(id_funcionario, mes, ano)
+        console.log(historico);    
         const filePath = path.join(__dirname, '..','documento', 'pdfs', 'folhaDePontoPoloUAB.docx')
         const content = fs.readFileSync(filePath, "binary");
 
@@ -29,7 +30,6 @@ export class DocumentoService {
 
     // 4. Definir os dados que vão substituir os placeholders
     doc.render({
-        user:user,
         matricula:"934.829.843",
         nome: "Francisco Martins Gonçalves Gomes",
         cargo: "Servente (Auxiliar de Serviços Gerais)",

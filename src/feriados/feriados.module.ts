@@ -5,5 +5,6 @@ import { FeriadosController } from './feriados.controller';
 @Module({
   controllers: [FeriadosController],
   providers: [FeriadosService],
+  exports:[FeriadosService]
 })
 export class FeriadosModule {}

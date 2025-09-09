@@ -262,7 +262,7 @@ export class HorarioService {
           }  
         })
       }
-      console.log(historico);
+      
       return {historico, statusCode: HttpStatus.OK}
     } catch (error) {
       throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.NOT_FOUND)

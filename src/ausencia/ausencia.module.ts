@@ -5,5 +5,6 @@ import { AusenciaController } from './ausencia.controller';
 @Module({
   controllers: [AusenciaController],
   providers: [AusenciaService],
+  exports:[AusenciaService]
 })
 export class AusenciaModule {}
