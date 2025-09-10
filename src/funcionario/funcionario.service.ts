@@ -44,9 +44,9 @@ export class FuncionarioService {
     }
   }
 
-  async findMatricula(matricula: number):  Promise<IGenerico<FuncionarioOne>> {
+  async findMatricula(id: number):  Promise<IGenerico<FuncionarioOne>> {
     try {
-       const dados: FuncionarioOne = await this.prisma.funcionarios.findFirst({where:{matricula}})
+       const dados: FuncionarioOne = await this.prisma.funcionarios.findFirst({where:{id}})
         if(dados === null){
           throw ('Sem registros para a matrícula informada')
         }

@@ -197,9 +197,8 @@ export class HorarioService {
       const qntDia = new Date(ano, mes, 0).getDate()
       const historico = []
 
-
       for(let index = 1; index <= qntDia; index++){
-        historico.push({ dia:index ,nomeDia:this.nomeDia(ano, mes, index), entrada:null, saida:null, ausencias:null, feriados:null})
+        historico.push({ d:index, nomeDia:this.nomeDia(ano, mes, index), entrada:'', saida:'', ausencias:'', feriados:''})
       }
       
       if(horarios){
@@ -211,7 +210,8 @@ export class HorarioService {
           if(ano === +anoH){
             if(mes === +mesH){
               const dia = dataCriado.split("-")[2]
-            if(dadosHisotrico.dia === +dia){
+              console.log(dadosHisotrico.d, dia);     
+            if(dadosHisotrico.d === +dia){
               dadosHisotrico.id = id
               dadosHisotrico.entrada = entrada
               dadosHisotrico.saida = saida
@@ -230,7 +230,7 @@ export class HorarioService {
         var qnt = diaFim - diaInicio
         if(qnt < 1){
           historico.forEach(dadosHistorico=>{
-            if(diaInicio === dadosHistorico.dia){
+            if(diaInicio === dadosHistorico.d){
               dadosHistorico.ausencias = tipoAusencia
             }
           })
@@ -251,7 +251,7 @@ export class HorarioService {
           var qnt = diaFim - diaInicio
           if(qnt < 1){
             historico.forEach(dadosHistorico=>{
-              if(diaInicio === dadosHistorico.dia){
+              if(diaInicio === dadosHistorico.d){
                 dadosHistorico.feriados = nome
               }
             })
@@ -262,6 +262,7 @@ export class HorarioService {
           }  
         })
       }
+      console.log(historico);
       
       return {historico, statusCode: HttpStatus.OK}
     } catch (error) {

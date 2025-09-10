@@ -4,21 +4,31 @@ import * as fs from "fs";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import { HorarioService } from 'src/horario/horario.service';
+import { FuncionarioService } from 'src/funcionario/funcionario.service';
 
 
 @Injectable()
 export class DocumentoService {
 
-    constructor(private readonly horariosService:HorarioService) { }
+    constructor(private readonly horariosService:HorarioService, private readonly funcionarioService:FuncionarioService) { }
 
-    async criarDocumento(id_funcionario:number, ano:number, mes:number){
+     nomeMes(num: number) {
+        const date = new Date()
+        date.setMonth(num - 1)
+
+        return date.toLocaleString('default', { month: 'long' })
+     }
+
+    async criarDocumento(id_funcionario:number, mes:number, ano:number){
         try {
-        
-        const historico = this.horariosService.getHistoricoFuncionario(id_funcionario, mes, ano)
-        console.log(historico);    
+        const nomeMes = this.nomeMes(mes)
+        const funcionario = await this.funcionarioService.findMatricula(id_funcionario)
+        const {nome, cargo, matricula} = funcionario.dados
+        const historico = await this.horariosService.getHistoricoFuncionario(id_funcionario, mes, ano)
+        var user = historico.historico
         const filePath = path.join(__dirname, '..','documento', 'pdfs', 'folhaDePontoPoloUAB.docx')
         const content = fs.readFileSync(filePath, "binary");
-
+        
     // 2. Carregar no PizZip
     const zip = new PizZip(content);
 
@@ -30,10 +40,11 @@ export class DocumentoService {
 
     // 4. Definir os dados que vão substituir os placeholders
     doc.render({
-        matricula:"934.829.843",
-        nome: "Francisco Martins Gonçalves Gomes",
-        cargo: "Servente (Auxiliar de Serviços Gerais)",
-        data: "05/09/2025",
+        a:user,
+        matricula,
+        nome,
+        cargo,
+        nomeMes
     });
 
     // 5. Gerar o documento final
