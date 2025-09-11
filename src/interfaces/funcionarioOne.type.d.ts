@@ -1,9 +1,11 @@
   export type FuncionarioOne = {
     id:number,
     adm:boolean,
+    cpf:string,
     primeiraEntrada:boolean,
-    matricula:number,
+    matricula:string,
     nome:string,
     cargo:string,
+    turno:string,
     senha:string
 }

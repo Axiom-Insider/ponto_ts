@@ -1,4 +1,4 @@
-import { IsBoolean, IsEmail, IsNotEmpty,  IsNumber, IsString, IsOptional } from "class-validator";
+import { IsBoolean, IsEmail, IsNotEmpty,  IsNumber, IsString, IsOptional, Length, Matches } from "class-validator";
 
 export class CreateFuncionarioDto {
     @IsNumber()
@@ -11,9 +11,14 @@ export class CreateFuncionarioDto {
     @IsOptional()
     primeiraEntrada?:boolean;
 
+    @IsString()
+    @Length(11, 11, { message: 'CPF deve ter 11 dígitos' })
+    @Matches(/^[0-9]+$/, { message: 'CPF deve conter apenas números' })
+    cpf:string;
+
     @IsNotEmpty({message:'Campo vazio Invalido'})
-    @IsNumber({}, {message:'Argumento matricula precisa ser um number'})
-    matricula: number;
+    @IsString({message:'Argumento matricula precisa ser um number'})
+    matricula: string;
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})
@@ -26,6 +31,10 @@ export class CreateFuncionarioDto {
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})
     empresa:string;
+
+    @IsNotEmpty({message:'Campo vazio Invalido'})
+    @IsString({message:'Argumento passado não é uma string'})
+    turno:string;
 
     @IsNotEmpty({message:'Campo vazio Invalido'})
     @IsString({message:'Argumento passado não é uma string'})

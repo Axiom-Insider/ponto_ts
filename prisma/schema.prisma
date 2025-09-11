@@ -24,9 +24,11 @@ model Funcionarios{
   id Int @id @default(autoincrement())
   adm Boolean @default(false)
   primeiraEntrada Boolean @default(false)
-  matricula Int @unique
+  cpf String @unique
+  matricula String 
   nome String
   cargo String 
+  turno String
   empresa String
   senha String 
   horarios Horarios[]

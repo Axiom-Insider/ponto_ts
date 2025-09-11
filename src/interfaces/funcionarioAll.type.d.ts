@@ -1,5 +1,7 @@
   export type FuncionarioAll = {
-    matricula: number;
+    matricula: string;
+    turno:string;
+    cpf:number;
     nome: string;
     cargo: string;
     senha: string;

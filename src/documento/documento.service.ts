@@ -22,7 +22,7 @@ export class DocumentoService {
     async criarDocumento(id_funcionario:number, mes:number, ano:number){
         try {
         const nomeMes = this.nomeMes(mes)
-        const funcionario = await this.funcionarioService.findMatricula(id_funcionario)
+        const funcionario = await this.funcionarioService.findId(id_funcionario)
         const {nome, cargo, matricula} = funcionario.dados
         const historico = await this.horariosService.getHistoricoFuncionario(id_funcionario, mes, ano)
         var user = historico.historico
@@ -56,7 +56,7 @@ export class DocumentoService {
     // 6. Salvar o arquivo
     fs.writeFileSync("documentos/saida.docx", buffer);
 
-    console.log("Documento gerado com sucesso!");   
+        return console.log("Documento gerado com sucesso!");   
         } catch (error) {
             throw new HttpException(`Erro ao consultar tabela funcionário: ${error}`, HttpStatus.NOT_FOUND)
         }

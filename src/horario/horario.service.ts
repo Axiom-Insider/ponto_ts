@@ -198,7 +198,7 @@ export class HorarioService {
       const historico = []
 
       for(let index = 1; index <= qntDia; index++){
-        historico.push({ d:index, nomeDia:this.nomeDia(ano, mes, index), entrada:'', saida:'', ausencias:'', feriados:''})
+        historico.push({ d:index, nomeDia:this.nomeDia(ano, mes, index), entrada:':', saida:':', ausencias:'', feriados:''})
       }
       
       if(horarios){
@@ -212,9 +212,10 @@ export class HorarioService {
               const dia = dataCriado.split("-")[2]
               console.log(dadosHisotrico.d, dia);     
             if(dadosHisotrico.d === +dia){
+              if(dadosHisotrico.nomeDia)
               dadosHisotrico.id = id
-              dadosHisotrico.entrada = entrada
-              dadosHisotrico.saida = saida
+              dadosHisotrico.entrada = entrada === null ? ':' : entrada
+              dadosHisotrico.saida = saida === null ? ':' : saida 
               }
             }
           }

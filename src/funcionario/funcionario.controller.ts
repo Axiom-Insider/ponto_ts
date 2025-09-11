@@ -25,7 +25,7 @@ export class FuncionarioController {
 
   @Get(':id')
   async findOne(@Res() res: Response, @Param('id') id: string): Promise<{}> {
-    const findOne =  await this.funcionarioService.findMatricula(+id);
+    const findOne =  await this.funcionarioService.findId(+id);
     return res.status(findOne.statusCode).json(findOne.dados)
   }
 

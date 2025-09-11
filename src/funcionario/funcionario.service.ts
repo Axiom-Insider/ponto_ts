@@ -32,9 +32,9 @@ export class FuncionarioService {
     }
   }
 
-  async findAll(): Promise<IGenerico<FuncionarioAll[]>> {
+  async findAll(): Promise<{dados:{}, statusCode:HttpStatus}> {
     try {
-      const dados: FuncionarioAll[] =  await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, cargo:true, senha:true} })
+      const dados =  await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, cargo:true, senha:true} })
       if (!dados || dados.length === 0) {
         throw ('Nenhum funcionário foi encontrado')
       }
@@ -44,9 +44,9 @@ export class FuncionarioService {
     }
   }
 
-  async findMatricula(id: number):  Promise<IGenerico<FuncionarioOne>> {
+  async findId(id: number):  Promise<IGenerico<FuncionarioOne>> {
     try {
-       const dados: FuncionarioOne = await this.prisma.funcionarios.findFirst({where:{id}})
+       const dados = await this.prisma.funcionarios.findFirst({where:{id}})
         if(dados === null){
           throw ('Sem registros para a matrícula informada')
         }
@@ -56,16 +56,30 @@ export class FuncionarioService {
     }
   }
 
-  async update(matricula: number, updateFuncionarioDto: UpdateFuncionarioDto): Promise<IMessage> {
+  async findCpf(cpf:string):Promise<IGenerico<FuncionarioOne>>{
+    try {
+      console.log(cpf);
+      
+      const dados = await this.prisma.funcionarios.findFirst({where:{cpf}})
+      if(dados){
+        throw ("Sem registro desse cpf")
+      }
+      return {dados, statusCode:HttpStatus.OK}
+    } catch (error) {
+      throw new HttpException(`Erro ao consultar a tabela funcionário: ${error}`, HttpStatus.NOT_FOUND)
+    }
+  }
+
+  async update(id: number, updateFuncionarioDto: UpdateFuncionarioDto): Promise<IMessage> {
     try {
       const found = await this.prisma.funcionarios.findUnique({
-        where: { matricula }
+        where: { id }
       })
       if (!found) {
         throw ('Funcionario não existe')
       }
 
-      const funcionario = await this.prisma.funcionarios.updateMany({ where: { matricula }, data: updateFuncionarioDto })
+      const funcionario = await this.prisma.funcionarios.updateMany({ where: { id }, data: updateFuncionarioDto })
       if(funcionario.count > 0){  
         return {  message:'Dados atualizados com sucesso', statusCode: HttpStatus.OK}
       }
