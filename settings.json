@@ -1,0 +1,25 @@
+{
+  // Formatter
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+
+  // Identação
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  // Organização automática dos imports
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true,
+    "source.fixAll": true
+  },
+
+  // Prettier configs
+  "prettier.semi": true,                // ponto e vírgula no final
+  "prettier.singleQuote": true,         // usar aspas simples
+  "prettier.trailingComma": "all",      // vírgula no último item de objeto/array
+  "prettier.printWidth": 100,           // largura máxima por linha
+  "prettier.tabWidth": 2,               // tamanho do tab
+  "prettier.bracketSpacing": true,      // espaço entre chaves { a: 1 }
+  "prettier.arrowParens": "always"      // sempre parênteses em arrow functions
+}

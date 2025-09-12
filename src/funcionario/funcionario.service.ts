@@ -34,7 +34,7 @@ export class FuncionarioService {
 
   async findAll(): Promise<{dados:{}, statusCode:HttpStatus}> {
     try {
-      const dados =  await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, cargo:true, senha:true} })
+      const dados =  await this.prisma.funcionarios.findMany({ where: { adm: false }, select:{matricula:true, nome:true, cargo:true, cpf:true, turno:true} })
       if (!dados || dados.length === 0) {
         throw ('Nenhum funcionário foi encontrado')
       }
@@ -61,7 +61,8 @@ export class FuncionarioService {
       console.log(cpf);
       
       const dados = await this.prisma.funcionarios.findFirst({where:{cpf}})
-      if(dados){
+
+      if(!dados){
         throw ("Sem registro desse cpf")
       }
       return {dados, statusCode:HttpStatus.OK}

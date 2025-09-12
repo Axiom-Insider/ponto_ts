@@ -28,7 +28,7 @@ export class AuthService {
                 throw ('Nenhum funcionário com essas credencias foi encontrado')
             }
 
-            const funcionario = {matricula:dados.cpf, adm:dados.adm, primeiraEntrada:dados.primeiraEntrada}
+            const funcionario = {cpf:dados.cpf, adm:dados.adm, primeiraEntrada:dados.primeiraEntrada}
 
             if(dados.primeiraEntrada){
                 if(bcryptCompareSync(senha, dados.senha)){
