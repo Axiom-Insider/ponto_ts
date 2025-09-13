@@ -231,9 +231,7 @@ export class HorarioService {
     }
   }
 
-  async verificarHorarioDoFuncionario(
-    id: number,
-  ): Promise<{
+  async verificarHorarioDoFuncionario(id: number): Promise<{
     entrada: boolean;
     saida: boolean;
     message: string;
@@ -296,8 +294,12 @@ export class HorarioService {
       for (let index = 1; index <= qntDia; index++) {
         historico.push({
           d: index,
-          nomeDia: this.nomeDia(ano, mes, index),
-          domingo: this.nomeDia(ano, mes, index) == 'Domingo' ? true : false,
+          dia:
+            this.nomeDia(ano, mes, index) == 'Domingo'
+              ? ''
+              : this.nomeDia(ano, mes, index),
+          domingo:
+            this.nomeDia(ano, mes, index) == 'Domingo' ? 'D O M I N G O' : '',
           entrada: ':',
           saida: ':',
           ausencias: '',
@@ -359,6 +361,8 @@ export class HorarioService {
             historico.forEach((dadosHistorico) => {
               if (diaInicio === dadosHistorico.d) {
                 dadosHistorico.feriados = nome;
+                dadosHistorico.entrada = '---------';
+                dadosHistorico.saida = '---------';
               }
             });
           } else {
@@ -368,6 +372,8 @@ export class HorarioService {
               novoDataInicio++
             ) {
               historico[novoDataInicio].feriados = nome;
+              historico[novoDataInicio].entrada = '---------';
+              historico[novoDataInicio].saida = '---------';
             }
           }
         });

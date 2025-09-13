@@ -31,6 +31,7 @@ export class DocumentoService {
         ano,
       );
       var user = historico.historico;
+
       const filePath = path.join(
         __dirname,
         '..',
@@ -48,6 +49,7 @@ export class DocumentoService {
         paragraphLoop: true,
         linebreaks: true,
       });
+      console.log(user);
 
       // 4. Definir os dados que vão substituir os placeholders
       doc.render({
