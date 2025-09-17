@@ -295,11 +295,13 @@ export class HorarioService {
         historico.push({
           d: index,
           dia:
-            this.nomeDia(ano, mes, index) == 'Domingo'
+            this.nomeDia(ano, mes, index) === 'Domingo' ||
+            this.nomeDia(ano, mes, index) === 'Sábado'
               ? ''
               : this.nomeDia(ano, mes, index),
-          domingo:
-            this.nomeDia(ano, mes, index) == 'Domingo' ? 'D O M I N G O' : '',
+          do:
+            this.nomeDia(ano, mes, index) === 'Domingo' ? 'D O M I N G O' : '',
+          sa: this.nomeDia(ano, mes, index) === 'Sábado' ? 'Sábado' : '',
           entrada: ':',
           saida: ':',
           ausencias: '',
@@ -344,8 +346,8 @@ export class HorarioService {
             let novoDataInicio = diaInicio - 1;
             for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
               historico[novoDataInicio].ausencias = tipoAusencia;
-              historico[novoDataInicio].entrada = '---------';
-              historico[novoDataInicio].saida = '---------';
+              historico[novoDataInicio].entrada = '- - - - - - - - ';
+              historico[novoDataInicio].saida = '- - - - - - - - ';
             }
           }
         });
@@ -360,7 +362,7 @@ export class HorarioService {
           if (qnt < 1) {
             historico.forEach((dadosHistorico) => {
               if (diaInicio === dadosHistorico.d) {
-                dadosHistorico.feriados = nome;
+                dadosHistorico.feriados = 'FERIADO = ' + nome;
                 dadosHistorico.entrada = '---------';
                 dadosHistorico.saida = '---------';
               }

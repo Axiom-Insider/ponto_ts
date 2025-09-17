@@ -22,7 +22,7 @@ export class DocumentoService {
 
   async criarDocumento(id_funcionario: number, mes: number, ano: number) {
     try {
-      const nomeMes = this.nomeMes(mes);
+      const nomeMes = this.nomeMes(mes).toUpperCase();
       const funcionario = await this.funcionarioService.findId(id_funcionario);
       const { nome, cargo, matricula, turno } = funcionario.dados;
       const historico = await this.horariosService.getHistoricoFuncionario(
