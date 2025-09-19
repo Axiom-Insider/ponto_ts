@@ -19,8 +19,8 @@ export class DocumentoService {
 
     return date.toLocaleString('default', { month: 'long' });
   }
-
-  async criarDocumento(id_funcionario: number, mes: number, ano: number) {
+  async;
+  async polouab(id_funcionario: number, mes: number, ano: number) {
     try {
       const nomeMes = this.nomeMes(mes).toUpperCase();
       const funcionario = await this.funcionarioService.findId(id_funcionario);
@@ -49,7 +49,6 @@ export class DocumentoService {
         paragraphLoop: true,
         linebreaks: true,
       });
-      console.log(user);
 
       // 4. Definir os dados que vão substituir os placeholders
       doc.render({
@@ -58,6 +57,7 @@ export class DocumentoService {
         matricula,
         nome,
         cargo,
+        ano,
         nomeMes,
       });
 
@@ -67,14 +67,18 @@ export class DocumentoService {
         compression: 'DEFLATE',
       });
 
-      // 6. Salvar o arquivo
-      fs.writeFileSync('documentos/saidaPoloUAB.docx', buffer);
+      var nomeArquivo = nome;
+      nomeArquivo = nomeArquivo.replace(/\s/g, '-');
+      fs.writeFileSync(
+        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}.docx`,
+        buffer,
+      );
       const saida = path.join(
         __dirname,
         '..',
         '..',
         'documentos',
-        'saidaPoloUAB.docx',
+        `folhaDePonto-${nomeMes}-${nomeArquivo}.docx`,
       );
       const caminho = path.join(saida);
 

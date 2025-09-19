@@ -272,8 +272,125 @@ export class HorarioService {
       );
     }
   }
-
   async getHistoricoFuncionario(
+    id_funcionario: number,
+    mes: number,
+    ano: number,
+  ): Promise<{ historico: {}; statusCode: number }> {
+    try {
+      const ausencias = await this.ausencias.findMesAno(
+        id_funcionario,
+        mes,
+        ano,
+      );
+      const feriados = await this.feriados.findMesAno(mes, ano);
+      const horarios = await this.prisma.horarios.findMany({
+        where: { id_funcionario },
+      });
+      const qntDia = new Date(ano, mes, 0).getDate();
+      const historico = [];
+
+      for (let index = 1; index <= qntDia; index++) {
+        historico.push({
+          d: index,
+          dia:
+            this.nomeDia(ano, mes, index) === 'Domingo' ||
+            this.nomeDia(ano, mes, index) === 'Sábado'
+              ? ''
+              : this.nomeDia(ano, mes, index),
+          do:
+            this.nomeDia(ano, mes, index) === 'Domingo' ? 'D O M I N G O' : '',
+          sa: this.nomeDia(ano, mes, index) === 'Sábado' ? 'Sábado' : '',
+          entrada: ':',
+          saida: ':',
+          ausencias: '',
+          feriados: '',
+        });
+      }
+
+      if (horarios) {
+        historico.forEach((dadosHisotrico) => {
+          horarios.forEach((dadosHorarios) => {
+            const { dataCriado, entrada, saida, id } = dadosHorarios;
+            const anoH = dataCriado.split('-')[0];
+            const mesH = dataCriado.split('-')[1];
+            if (ano === +anoH) {
+              if (mes === +mesH) {
+                const dia = dataCriado.split('-')[2];
+                if (dadosHisotrico.d === +dia) {
+                  if (dadosHisotrico.nomeDia) dadosHisotrico.id = id;
+                  dadosHisotrico.entrada = entrada === null ? ':' : entrada;
+                  dadosHisotrico.saida = saida === null ? ':' : saida;
+                }
+              }
+            }
+          });
+        });
+      }
+      if (ausencias) {
+        ausencias.forEach((element) => {
+          const { dataInicio, dataFim, tipoAusencia } = element;
+          const diaInicio = +dataInicio.split('-')[2];
+          const diaFim = +dataFim.split('-')[2];
+          var qnt = diaFim - diaInicio;
+          if (qnt < 1) {
+            historico.forEach((dadosHistorico) => {
+              if (diaInicio === dadosHistorico.d) {
+                dadosHistorico.entrada = '---------';
+                dadosHistorico.saida = '---------';
+                dadosHistorico.ausencias = tipoAusencia;
+              }
+            });
+          } else {
+            let novoDataInicio = diaInicio - 1;
+            for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+              historico[novoDataInicio].ausencias = tipoAusencia;
+              historico[novoDataInicio].entrada = '- - - - - - - - ';
+              historico[novoDataInicio].saida = '- - - - - - - - ';
+            }
+          }
+        });
+      }
+
+      if (feriados) {
+        feriados.forEach((dadosFeriados) => {
+          const { dataInicio, dataFim, nome } = dadosFeriados;
+          const diaInicio = +dataInicio.split('-')[2];
+          const diaFim = +dataFim.split('-')[2];
+          var qnt = diaFim - diaInicio;
+          if (qnt < 1) {
+            historico.forEach((dadosHistorico) => {
+              if (diaInicio === dadosHistorico.d) {
+                dadosHistorico.feriados = 'FERIADO = ' + nome;
+                dadosHistorico.entrada = '---------';
+                dadosHistorico.saida = '---------';
+              }
+            });
+          } else {
+            for (
+              let novoDataInicio = diaInicio - 1;
+              novoDataInicio < diaFim;
+              novoDataInicio++
+            ) {
+              historico[novoDataInicio].feriados = nome;
+              historico[novoDataInicio].entrada = '---------';
+              historico[novoDataInicio].saida = '---------';
+            }
+          }
+        });
+      }
+
+      return { historico, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao encontrar dados de horarios: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+}
+
+async getHistoricoFuncionarioConfianca(
     id_funcionario: number,
     mes: number,
     ano: number,

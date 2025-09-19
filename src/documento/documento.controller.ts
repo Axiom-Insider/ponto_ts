@@ -6,26 +6,34 @@ import { Response } from 'express';
 export class DocumentoController {
   constructor(private readonly documentoService: DocumentoService) {}
 
-  @Get('/:id_funcionario/:mes/:ano')
-  async create(
+  @Get('/polouab/:id_funcionario/:mes/:ano')
+  async polouab(
     @Param('id_funcionario') id_funcionario: string,
     @Param('mes') mes: string,
     @Param('ano') ano: string,
     @Res() res: Response,
   ) {
     try {
-      const buffer = await this.documentoService.criarDocumento(
+      const buffer = await this.documentoService.polouab(
         +id_funcionario,
         +mes,
         +ano,
       );
 
-      return res.download(buffer, 'saida.docx');
+      return res.download(buffer);
     } catch (error) {
       console.error('Erro ao enviar o arquivo:', error);
       return res.status(500).send('Erro ao enviar o documento');
     }
   }
+
+  @Get('/confianca/:id_funcionario/:mes/:ano')
+  async confianca(
+    @Param('id_funcionario') id_funcionario: string,
+    @Param('mes') mes: string,
+    @Param('ano') ano: string,
+    @Res() res: Response,
+  ) {}
 
   @Get('baixar')
   async baixar(@Res() res: Response) {
