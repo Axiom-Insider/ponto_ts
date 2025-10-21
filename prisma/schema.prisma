@@ -20,6 +20,11 @@ enum TipoAusencia {
   OUTRO
 }
 
+enum TipoTurno {
+  Matutino
+  Vespertino
+}
+
 model Funcionarios{
   id Int @id @default(autoincrement())
   adm Boolean @default(false)
@@ -28,7 +33,7 @@ model Funcionarios{
   matricula String 
   nome String
   cargo String 
-  turno String
+  turno TipoTurno
   empresa String
   senha String 
   horarios Horarios[]

@@ -33,7 +33,20 @@ export class DocumentoController {
     @Param('mes') mes: string,
     @Param('ano') ano: string,
     @Res() res: Response,
-  ) {}
+  ) {
+    try {
+      const buffer = await this.documentoService.confianca(
+        +id_funcionario,
+        +mes,
+        +ano,
+      );
+
+      return res.download(buffer);
+    } catch (error) {
+      console.error('Erro ao enviar o arquivo:', error);
+      return res.status(500).send('Erro ao enviar o documento');
+    }
+  }
 
   @Get('baixar')
   async baixar(@Res() res: Response) {

@@ -19,7 +19,7 @@ export class DocumentoService {
 
     return date.toLocaleString('default', { month: 'long' });
   }
-  async;
+
   async polouab(id_funcionario: number, mes: number, ano: number) {
     try {
       const nomeMes = this.nomeMes(mes).toUpperCase();
@@ -70,7 +70,7 @@ export class DocumentoService {
       var nomeArquivo = nome;
       nomeArquivo = nomeArquivo.replace(/\s/g, '-');
       fs.writeFileSync(
-        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}.docx`,
+        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-PoloUAB.docx`,
         buffer,
       );
       const saida = path.join(
@@ -78,7 +78,78 @@ export class DocumentoService {
         '..',
         '..',
         'documentos',
-        `folhaDePonto-${nomeMes}-${nomeArquivo}.docx`,
+        `folhaDePonto-${nomeMes}-${nomeArquivo}-PoloUAB.docx`,
+      );
+      const caminho = path.join(saida);
+
+      return caminho;
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar tabela funcionário: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async confianca(id_funcionario: number, mes: number, ano: number) {
+    try {
+      const nomeMes = this.nomeMes(mes).toUpperCase();
+      const funcionario = await this.funcionarioService.findId(id_funcionario);
+      const { nome, cargo, cpf } = funcionario.dados;
+      const historico =
+        await this.horariosService.getHistoricoFuncionarioConfianca(
+          id_funcionario,
+          mes,
+          ano,
+        );
+      var user = historico.historico;
+
+      const filePath = path.join(
+        __dirname,
+        '..',
+        'documento',
+        'pdfs',
+        'folhaDePontoConfianca.docx',
+      );
+      const content = fs.readFileSync(filePath, 'binary');
+
+      // 2. Carregar no PizZip
+      const zip = new PizZip(content);
+
+      // 3. Criar instância do Docxtemplater
+      const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+      });
+
+      // 4. Definir os dados que vão substituir os placeholders
+      doc.render({
+        a: user,
+        cpf,
+        nome,
+        cargo,
+        ano,
+        nomeMes,
+      });
+
+      // 5. Gerar o documento final
+      const buffer = doc.getZip().generate({
+        type: 'nodebuffer',
+        compression: 'DEFLATE',
+      });
+
+      var nomeArquivo = nome;
+      nomeArquivo = nomeArquivo.replace(/\s/g, '-');
+      fs.writeFileSync(
+        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-Confianca.docx`,
+        buffer,
+      );
+      const saida = path.join(
+        __dirname,
+        '..',
+        '..',
+        'documentos',
+        `folhaDePonto-${nomeMes}-${nomeArquivo}-Confianca.docx`,
       );
       const caminho = path.join(saida);
 
