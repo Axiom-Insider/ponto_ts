@@ -42,7 +42,7 @@ model Funcionarios{
 
 model Horarios{
   id Int @id @default(autoincrement())
-  dataCriado String 
+  dataCriada String 
   entrada String
   saida String? 
   id_funcionario Int 

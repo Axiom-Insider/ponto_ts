@@ -53,17 +53,15 @@ export class HorarioService {
     return nomeDia[data.getDay()];
   }
 
-  async registrarEntrada(
-    createHorarioDto: CreateHorarioDto,
-  ): Promise<IMessage> {
+  async registrarEntrada(createHorarioDto: CreateHorarioDto): Promise<IMessage> {
     try {
       const { id_funcionario } = createHorarioDto;
       const date = new Date();
-      const dataCriado = new Date().toISOString().split('T')[0];
+      const dataCriada = new Date().toISOString().split('T')[0];
       const entrada = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
 
       const horarios = await this.prisma.horarios.findFirst({
-        where: { dataCriado, id_funcionario },
+        where: { dataCriada, id_funcionario },
       });
 
       if (horarios) {
@@ -71,17 +69,14 @@ export class HorarioService {
       }
 
       await this.prisma.horarios.create({
-        data: { dataCriado, entrada, id_funcionario },
+        data: { dataCriada, entrada, id_funcionario },
       });
       return {
         message: 'Entrada registrada com sucesso',
         statusCode: HttpStatus.CREATED,
       };
     } catch (error) {
-      throw new HttpException(
-        `Erro ao registrar entrada: ${error}`,
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT);
     }
   }
 
@@ -89,10 +84,10 @@ export class HorarioService {
     try {
       const { id_funcionario } = createHorarioDto;
       const date = new Date();
-      const dataCriado = new Date().toISOString().split('T')[0];
+      const dataCriada = new Date().toISOString().split('T')[0];
       const saida = `${date.getHours() < 10 ? '0' + date.getHours() : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}`;
       const horarios = await this.prisma.horarios.findFirst({
-        where: { dataCriado, id_funcionario },
+        where: { dataCriada, id_funcionario },
       });
 
       if (!horarios) {
@@ -104,7 +99,7 @@ export class HorarioService {
       }
 
       await this.prisma.horarios.updateMany({
-        where: { id_funcionario, dataCriado },
+        where: { id_funcionario, dataCriada },
         data: { saida },
       });
       return {
@@ -112,18 +107,15 @@ export class HorarioService {
         statusCode: HttpStatus.CREATED,
       };
     } catch (error) {
-      throw new HttpException(
-        `Erro ao registrar entrada: ${error}`,
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException(`Erro ao registrar entrada: ${error}`, HttpStatus.CONFLICT);
     }
   }
   async getHorarioDia(): Promise<HorarioDoDia> {
     try {
-      const dataCriado = new Date().toISOString().split('T')[0];
+      const dataCriada = new Date().toISOString().split('T')[0];
       const horarios = await this.prisma.horarios.findMany({
         where: {
-          dataCriado,
+          dataCriada,
         },
         select: {
           entrada: true,
@@ -173,61 +165,49 @@ export class HorarioService {
       });
       return { funcionarios, statusCode: HttpStatus.OK };
     } catch (error) {
-      throw new HttpException(
-        `Erro ao encontrar dados de horarios: ${error}`,
-        HttpStatus.CONFLICT,
-      );
+      throw new HttpException(`Erro ao encontrar dados de horarios: ${error}`, HttpStatus.CONFLICT);
     }
   }
 
   async editarHorarios(updateHorarioDto: UpdateHorarioDto) {
     try {
-      const { id_funcionario } = updateHorarioDto;
-      const date = new Date(updateHorarioDto.dataCriado);
-      const dataCriado = date.toISOString().split('T')[0];
-
-      const horarios = await this.prisma.horarios.findFirst({
-        where: { dataCriado },
+      const { id_funcionario, dataCriada, entrada, saida } = updateHorarioDto;
+      const horarios = await this.prisma.horarios.findMany({
+        where: { AND: [{ dataCriada, id_funcionario }] },
       });
 
-      if (!horarios) {
-        if (!updateHorarioDto.entrada) {
+      if (!horarios[0]) {
+        if (!entrada) {
           throw 'Registre horario de entrada primeiro!';
         }
-        const entradaTemp = new Date(updateHorarioDto.entrada);
-        const entrada = `${entradaTemp.getHours() < 10 ? '0' + entradaTemp.getHours() : entradaTemp.getHours()}:${entradaTemp.getMinutes() < 10 ? '0' + entradaTemp.getMinutes() : entradaTemp.getMinutes()}`;
+
         await this.prisma.horarios.create({
-          data: { dataCriado, entrada: entrada, id_funcionario },
+          data: { dataCriada, entrada, id_funcionario },
         });
         return {
-          message: 'Horario atualizado com suceso',
+          message: 'Horario atualizado com sucesso',
           statusCode: HttpStatus.CREATED,
         };
       }
 
-      const entradaTemp = new Date(updateHorarioDto.entrada);
-      const saidaTemp = new Date(updateHorarioDto.saida);
-      const entrada = !updateHorarioDto.entrada
-        ? horarios.entrada
-        : `${entradaTemp.getHours() < 10 ? '0' + entradaTemp.getHours() : entradaTemp.getHours()}:${entradaTemp.getMinutes() < 10 ? '0' + entradaTemp.getMinutes() : entradaTemp.getMinutes()}`;
-      const saida = !updateHorarioDto.saida
-        ? horarios.saida
-        : `${saidaTemp.getHours() < 10 ? '0' + saidaTemp.getHours() : saidaTemp.getHours()}:${saidaTemp.getMinutes() < 10 ? '0' + saidaTemp.getMinutes() : saidaTemp.getMinutes()}`;
-      console.log(entrada, saida, dataCriado);
+      if (!entrada) {
+        await this.prisma.horarios.updateMany({
+          where: { id: horarios[0].id },
+          data: { saida },
+        });
+      }
 
       await this.prisma.horarios.updateMany({
-        where: { id: horarios.id },
-        data: { entrada, saida },
+        where: { id: horarios[0].id },
+        data: { entrada },
       });
+
       return {
         message: 'Horario atualizado com sucesso',
         statusCode: HttpStatus.OK,
       };
     } catch (error) {
-      throw new HttpException(
-        `Erro ao encontrar dados de horarios: ${error}`,
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException(`Erro ao editar horarios: ${error}`, HttpStatus.NOT_FOUND);
     }
   }
 
@@ -239,10 +219,10 @@ export class HorarioService {
   }> {
     try {
       const date = new Date();
-      const dataCriado = date.toISOString().split('T')[0];
+      const dataCriada = date.toISOString().split('T')[0];
 
       const horarios = await this.prisma.horarios.findMany({
-        where: { AND: [{ dataCriado, id: id }] },
+        where: { AND: [{ dataCriada, id: id }] },
         select: {
           entrada: true,
           saida: true,
@@ -278,11 +258,7 @@ export class HorarioService {
     ano: number,
   ): Promise<{ historico: {}; statusCode: number }> {
     try {
-      const ausencias = await this.ausencias.findMesAno(
-        id_funcionario,
-        mes,
-        ano,
-      );
+      const ausencias = await this.ausencias.findMesAno(id_funcionario, mes, ano);
       const feriados = await this.feriados.findMesAno(mes, ano);
       const horarios = await this.prisma.horarios.findMany({
         where: { id_funcionario },
@@ -298,8 +274,7 @@ export class HorarioService {
             this.nomeDia(ano, mes, index) === 'Sábado'
               ? ''
               : this.nomeDia(ano, mes, index),
-          do:
-            this.nomeDia(ano, mes, index) === 'Domingo' ? 'D O M I N G O' : '',
+          do: this.nomeDia(ano, mes, index) === 'Domingo' ? 'D O M I N G O' : '',
           sa: this.nomeDia(ano, mes, index) === 'Sábado' ? 'Sábado' : '',
           entrada: ':',
           saida: ':',
@@ -311,12 +286,12 @@ export class HorarioService {
       if (horarios) {
         historico.forEach((dadosHisotrico) => {
           horarios.forEach((dadosHorarios) => {
-            const { dataCriado, entrada, saida, id } = dadosHorarios;
-            const anoH = dataCriado.split('-')[0];
-            const mesH = dataCriado.split('-')[1];
+            const { dataCriada, entrada, saida, id } = dadosHorarios;
+            const anoH = dataCriada.split('-')[0];
+            const mesH = dataCriada.split('-')[1];
             if (ano === +anoH) {
               if (mes === +mesH) {
-                const dia = dataCriado.split('-')[2];
+                const dia = dataCriada.split('-')[2];
                 if (dadosHisotrico.d === +dia) {
                   if (dadosHisotrico.nomeDia) dadosHisotrico.id = id;
                   dadosHisotrico.entrada = entrada === null ? ':' : entrada;
@@ -367,11 +342,7 @@ export class HorarioService {
               }
             });
           } else {
-            for (
-              let novoDataInicio = diaInicio - 1;
-              novoDataInicio < diaFim;
-              novoDataInicio++
-            ) {
+            for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
               historico[novoDataInicio].feriados = nome;
               historico[novoDataInicio].entrada = '---------';
               historico[novoDataInicio].saida = '---------';
@@ -396,11 +367,7 @@ export class HorarioService {
     ano: number,
   ): Promise<{ historico: {}; statusCode: number }> {
     try {
-      const ausencias = await this.ausencias.findMesAno(
-        id_funcionario,
-        mes,
-        ano,
-      );
+      const ausencias = await this.ausencias.findMesAno(id_funcionario, mes, ano);
       const feriados = await this.feriados.findMesAno(mes, ano);
       const horarios = await this.prisma.horarios.findMany({
         where: { id_funcionario },
@@ -435,12 +402,12 @@ export class HorarioService {
       if (horarios) {
         historico.forEach((dadosHisotrico) => {
           horarios.forEach((dadosHorarios) => {
-            const { dataCriado, entrada, saida, id } = dadosHorarios;
-            const anoH = dataCriado.split('-')[0];
-            const mesH = dataCriado.split('-')[1];
+            const { dataCriada, entrada, saida, id } = dadosHorarios;
+            const anoH = dataCriada.split('-')[0];
+            const mesH = dataCriada.split('-')[1];
             if (ano === +anoH) {
               if (mes === +mesH) {
-                const dia = dataCriado.split('-')[2];
+                const dia = dataCriada.split('-')[2];
                 if (dadosHisotrico.d === +dia) {
                   if (dadosHisotrico.nomeDia) dadosHisotrico.id = id;
                   if (dadosHisotrico.di != '') {
@@ -508,11 +475,7 @@ export class HorarioService {
               }
             });
           } else {
-            for (
-              let novoDataInicio = diaInicio - 1;
-              novoDataInicio < diaFim;
-              novoDataInicio++
-            ) {
+            for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
               historico[novoDataInicio].feriados = nome;
               historico[novoDataInicio].entrada = '---------';
               historico[novoDataInicio].saida = '---------';
