@@ -25,6 +25,14 @@ enum TipoTurno {
   Vespertino
 }
 
+enum TipoFeriado {
+  Nacional
+  Estadual
+  Municipal
+  Regional
+  Institucional
+}
+
 model Funcionarios{
   id Int @id @default(autoincrement())
   adm Boolean @default(false)
@@ -37,7 +45,7 @@ model Funcionarios{
   empresa String
   senha String 
   horarios Horarios[]
-  ausencia Ausencia[]
+  ausencia Ausencias[]
 }
 
 model Horarios{
@@ -52,16 +60,17 @@ model Horarios{
 model Feriados{
   id Int @id @default(autoincrement())
   nome String 
+  tipoFeriado TipoFeriado
   dataInicio String
-  dataFim String?
+  dataFim String
   nacional Boolean 
 }
 
-model Ausencia{
+model Ausencias{
   id Int @id @default(autoincrement())
   tipoAusencia TipoAusencia 
   dataInicio String
-  dataFim String? 
+  dataFim String 
   id_funcionario Int
   funcionarios Funcionarios @relation(fields: [id_funcionario], references: [id])
 }

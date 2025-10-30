@@ -320,8 +320,8 @@ export class HorarioService {
             let novoDataInicio = diaInicio - 1;
             for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
               historico[novoDataInicio].ausencias = tipoAusencia;
-              historico[novoDataInicio].entrada = '- - - - - - - - ';
-              historico[novoDataInicio].saida = '- - - - - - - - ';
+              historico[novoDataInicio].entrada = '---------';
+              historico[novoDataInicio].saida = '----------';
             }
           }
         });
@@ -329,21 +329,21 @@ export class HorarioService {
 
       if (feriados) {
         feriados.forEach((dadosFeriados) => {
-          const { dataInicio, dataFim, nome } = dadosFeriados;
+          const { dataInicio, dataFim, nome, tipoFeriado } = dadosFeriados;
           const diaInicio = +dataInicio.split('-')[2];
           const diaFim = +dataFim.split('-')[2];
           var qnt = diaFim - diaInicio;
           if (qnt < 1) {
             historico.forEach((dadosHistorico) => {
               if (diaInicio === dadosHistorico.d) {
-                dadosHistorico.feriados = 'FERIADO = ' + nome;
+                dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
                 dadosHistorico.entrada = '---------';
                 dadosHistorico.saida = '---------';
               }
             });
           } else {
             for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].feriados = nome;
+              historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
               historico[novoDataInicio].entrada = '---------';
               historico[novoDataInicio].saida = '---------';
             }

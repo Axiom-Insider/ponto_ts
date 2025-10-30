@@ -1,23 +1,26 @@
-import { IsBoolean, IsDateString, IsNumber, IsOptional, IsString } from "class-validator";
+import { TipoFeriado } from '@prisma/client';
+import { IsBoolean, IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateFeriadoDto {
+  @IsOptional()
+  @IsNumber()
+  id: number;
 
-    @IsOptional()
-    @IsNumber()
-    id:number;
+  @IsString()
+  nome: string;
 
-    @IsString()
-    nome:string;
+  @IsEnum(TipoFeriado)
+  tipoFeriado: TipoFeriado;
 
-    @IsString()
-    @IsDateString()
-    dataInicio:string;
+  @IsString()
+  @IsDateString()
+  dataInicio: string;
 
-    @IsString()
-    @IsOptional()
-    @IsDateString()
-    dataFim:string;
+  @IsString()
+  @IsOptional()
+  @IsDateString()
+  dataFim: string;
 
-    @IsBoolean()
-    nacional:boolean;
+  @IsBoolean()
+  nacional: boolean;
 }
