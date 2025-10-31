@@ -50,6 +50,9 @@ export class FeriadosService {
       );
     }
   }
+
+  async findAnoTipo(ano: number) {}
+
   async findAno(ano: number): Promise<any> {
     try {
       const feriadosSem = [];
