@@ -6,6 +6,7 @@ import { IMessage } from 'src/interfaces/message.type';
 import { IGenerico } from 'src/interfaces/dados';
 import { Feriados } from 'src/interfaces/feriados';
 import { toZonedTime } from 'date-fns-tz';
+import { TipoFeriado } from '@prisma/client';
 
 @Injectable()
 export class FeriadosService {
@@ -51,7 +52,22 @@ export class FeriadosService {
     }
   }
 
-  async findAnoTipo(ano: number) {}
+  async findAnoTipo(ano: string, tipoFeriado: TipoFeriado) {
+    const feriadoSem = [];
+    const dadosFeriados = await this.prisma.feriados.findMany({
+      where: {
+        AND: [
+          {
+            dataInicio: {
+              startsWith: ano,
+            },
+            tipoFeriado,
+          },
+        ],
+      },
+    });
+    return dadosFeriados;
+  }
 
   async findAno(ano: number): Promise<any> {
     try {
