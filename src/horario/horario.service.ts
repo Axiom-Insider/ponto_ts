@@ -212,36 +212,39 @@ export class HorarioService {
   }
 
   async verificarHorarioDoFuncionario(id: number): Promise<{
-    entrada: boolean;
-    saida: boolean;
+    entrada: string | null;
+    saida: string | null;
     message: string;
     statusCode: number;
   }> {
     try {
       const date = new Date();
       const dataCriada = date.toISOString().split('T')[0];
-
+      console.log(id, dataCriada);
+      
       const horarios = await this.prisma.horarios.findMany({
-        where: { AND: [{ dataCriada, id: id }] },
+        where: {dataCriada, id_funcionario: id},
         select: {
           entrada: true,
           saida: true,
         },
       });
-
-      if (!horarios[0]) {
+      console.log(horarios);
+      
+      if(!horarios[0]) {
         return {
-          entrada: false,
-          saida: false,
-          message: 'Nenhum horario encontrado para o funcionário',
+          entrada: null, 
+          saida: null,
+          message: 'Nenhum horario registrado para hoje',
           statusCode: HttpStatus.OK,
         };
       }
-      const { saida } = horarios[0];
+
+      const { saida, entrada} = horarios[0];
 
       return {
-        entrada: true,
-        saida: !saida ? false : true,
+        entrada: !entrada ? null : entrada,
+        saida: !saida ? null : saida,
         message: 'Horario encontrado com sucesso',
         statusCode: HttpStatus.OK,
       };
