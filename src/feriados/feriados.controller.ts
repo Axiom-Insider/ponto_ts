@@ -16,6 +16,11 @@ export class FeriadosController {
     return this.feriadosService.findAnoTipo(ano, TipoFeriado[tipo]);
   }
 
+  @Get('anos')
+  findDadosAno() {
+    return this.feriadosService.findDadosAnos();
+  }
+
   @Post()
   create(@Body() createFeriadoDto: CreateFeriadoDto) {
     return this.feriadosService.create(createFeriadoDto);

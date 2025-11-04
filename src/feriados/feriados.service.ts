@@ -52,21 +52,43 @@ export class FeriadosService {
     }
   }
 
-  async findAnoTipo(ano: string, tipoFeriado: TipoFeriado) {
-    const feriadoSem = [];
-    const dadosFeriados = await this.prisma.feriados.findMany({
-      where: {
-        AND: [
-          {
-            dataInicio: {
-              startsWith: ano,
+  async findAnoTipo(ano: string, tipoFeriado: TipoFeriado): Promise<IGenerico<Feriados[]>> {
+    try {
+      const dados = await this.prisma.feriados.findMany({
+        where: {
+          AND: [
+            {
+              dataInicio: {
+                startsWith: ano,
+              },
+              tipoFeriado,
             },
-            tipoFeriado,
-          },
-        ],
-      },
-    });
-    return dadosFeriados;
+          ],
+        },
+      });
+      return { dados, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar tabela feriados: ${error.message}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async findDadosAnos(): Promise<{ dados: {}; statusCode: HttpStatus }> {
+    try {
+      const dados = await this.prisma.$queryRaw`
+      SELECT DISTINCT LEFT(dataInicio, 4) AS ano
+      FROM Feriados
+      ORDER BY ano DESC
+      `;
+      return { dados, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar tabela feriados: ${error.message}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   async findAno(ano: number): Promise<any> {
