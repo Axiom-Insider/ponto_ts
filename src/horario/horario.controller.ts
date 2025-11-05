@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { HorarioService } from './horario.service';
 import { CreateHorarioDto } from './dto/create-horario.dto';
@@ -35,19 +25,12 @@ export class HorarioController {
   }
 
   @Post('entrada')
-  async createEntrada(
-    @Body() createHorarioDto: CreateHorarioDto,
-    @Res() res: Response,
-  ) {
-    const horario =
-      await this.horarioService.registrarEntrada(createHorarioDto);
+  async createEntrada(@Body() createHorarioDto: CreateHorarioDto, @Res() res: Response) {
+    const horario = await this.horarioService.registrarEntrada(createHorarioDto);
     return res.status(horario.statusCode).json(horario);
   }
   @Post('saida')
-  async createSaida(
-    @Body() createHorarioDto: CreateHorarioDto,
-    @Res() res: Response,
-  ) {
+  async createSaida(@Body() createHorarioDto: CreateHorarioDto, @Res() res: Response) {
     const horario = await this.horarioService.registrarSaida(createHorarioDto);
     return res.status(horario.statusCode).json(horario);
   }
@@ -59,10 +42,7 @@ export class HorarioController {
   }
 
   @Patch('editar')
-  async editar(
-    @Body() updateHorarioDto: UpdateHorarioDto,
-    @Res() res: Response,
-  ) {
+  async editar(@Body() updateHorarioDto: UpdateHorarioDto, @Res() res: Response) {
     const horario = await this.horarioService.editarHorarios(updateHorarioDto);
     return res.status(horario.statusCode).json(horario);
   }
@@ -78,6 +58,12 @@ export class HorarioController {
     return res.status(horario.statusCode).json(horario);
   }
 
+  @Get('/verificarDia')
+  async verificarDia(@Res() res: Response) {
+    const horario = await this.horarioService.getHorarioDia();
+    return res.status(horario.statusCode).json(horario);
+  }
+
   @Get('/historico/:id_funcionario/:mes/:ano')
   async getHistoricoFuncionario(
     @Param('id_funcionario') id_funcionario: string,
@@ -85,11 +71,7 @@ export class HorarioController {
     @Param('ano') ano: string,
     @Res() res: Response,
   ) {
-    const horario = await this.horarioService.getHistoricoFuncionario(
-      +id_funcionario,
-      +mes,
-      +ano,
-    );
+    const horario = await this.horarioService.getHistoricoFuncionario(+id_funcionario, +mes, +ano);
     return res.status(horario.statusCode).json(horario);
   }
 }

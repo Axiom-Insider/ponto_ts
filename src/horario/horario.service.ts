@@ -211,6 +211,14 @@ export class HorarioService {
     }
   }
 
+  async verificarAllFuncionarios() {
+    try {
+      const date = new Date();
+
+      const horarios = await this.prisma.horarios.findMany({ where: {} });
+    } catch (error) {}
+  }
+
   async verificarHorarioDoFuncionario(id: number): Promise<{
     entrada: string | null;
     saida: string | null;
@@ -221,26 +229,26 @@ export class HorarioService {
       const date = new Date();
       const dataCriada = date.toISOString().split('T')[0];
       console.log(id, dataCriada);
-      
+
       const horarios = await this.prisma.horarios.findMany({
-        where: {dataCriada, id_funcionario: id},
+        where: { dataCriada, id_funcionario: id },
         select: {
           entrada: true,
           saida: true,
         },
       });
       console.log(horarios);
-      
-      if(!horarios[0]) {
+
+      if (!horarios[0]) {
         return {
-          entrada: null, 
+          entrada: null,
           saida: null,
           message: 'Nenhum horario registrado para hoje',
           statusCode: HttpStatus.OK,
         };
       }
 
-      const { saida, entrada} = horarios[0];
+      const { saida, entrada } = horarios[0];
 
       return {
         entrada: !entrada ? null : entrada,
