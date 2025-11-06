@@ -228,7 +228,6 @@ export class HorarioService {
     try {
       const date = new Date();
       const dataCriada = date.toISOString().split('T')[0];
-      console.log(id, dataCriada);
 
       const horarios = await this.prisma.horarios.findMany({
         where: { dataCriada, id_funcionario: id },
@@ -237,7 +236,6 @@ export class HorarioService {
           saida: true,
         },
       });
-      console.log(horarios);
 
       if (!horarios[0]) {
         return {
@@ -494,7 +492,6 @@ export class HorarioService {
           }
         });
       }
-      console.log(historico);
       return { historico, statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
