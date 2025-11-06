@@ -211,14 +211,6 @@ export class HorarioService {
     }
   }
 
-  async verificarAllFuncionarios() {
-    try {
-      const date = new Date();
-
-      const horarios = await this.prisma.horarios.findMany({ where: {} });
-    } catch (error) {}
-  }
-
   async verificarHorarioDoFuncionario(id: number): Promise<{
     entrada: string | null;
     saida: string | null;
@@ -261,6 +253,125 @@ export class HorarioService {
       );
     }
   }
+
+  async dadosAnos(id_funcionario: number): Promise<{ dados: {}; statusCode: HttpStatus }> {
+    try {
+      const dados = await this.prisma.$queryRaw`
+      SELECT DISTINCT LEFT(dataCriada, 4) AS ano
+      FROM Horarios
+      WHERE id_funcionario = ${id_funcionario}
+      ORDER BY ano DESC
+      `;
+      return { dados, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar tabela feriados: ${error.message}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async getHistorico(id_funcionario: number, mes: number, ano: number) {
+    try {
+      const ausencias = await this.ausencias.findMesAno(id_funcionario, mes, ano);
+      const feriados = await this.feriados.findMesAno(mes, ano);
+      const horarios = await this.prisma.horarios.findMany({
+        where: { id_funcionario },
+      });
+      const qntDia = new Date(ano, mes, 0).getDate();
+      const historico = [];
+      for (let index = 1; index <= qntDia; index++) {
+        historico.push({
+          id: '',
+          dia: index,
+          diaNome: this.nomeDia(ano, mes, index),
+          entrada: ':',
+          saida: ':',
+          ausencias: '',
+          feriados: '',
+        });
+      }
+
+      if (horarios) {
+        historico.forEach((dadosHisotrico) => {
+          horarios.forEach((dadosHorarios) => {
+            const { dataCriada, entrada, saida, id } = dadosHorarios;
+            const anoH = dataCriada.split('-')[0];
+            const mesH = dataCriada.split('-')[1];
+            if (ano === +anoH) {
+              if (mes === +mesH) {
+                const dia = dataCriada.split('-')[2];
+                if (dadosHisotrico.dia === +dia) {
+                  if (dadosHisotrico.nomeDia) dadosHisotrico.id = id;
+                  dadosHisotrico.id = id;
+                  dadosHisotrico.entrada = entrada === null ? ':' : entrada;
+                  dadosHisotrico.saida = saida === null ? ':' : saida;
+                }
+              }
+            }
+          });
+        });
+      }
+
+      if (ausencias) {
+        ausencias.forEach((element) => {
+          const { dataInicio, dataFim, tipoAusencia } = element;
+          const diaInicio = +dataInicio.split('-')[2];
+          const diaFim = +dataFim.split('-')[2];
+          var qnt = diaFim - diaInicio;
+          if (qnt < 1) {
+            historico.forEach((dadosHistorico) => {
+              if (diaInicio === dadosHistorico.d) {
+                dadosHistorico.entrada = '---------';
+                dadosHistorico.saida = '---------';
+                dadosHistorico.ausencias = tipoAusencia;
+              }
+            });
+          } else {
+            let novoDataInicio = diaInicio - 1;
+            for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+              historico[novoDataInicio].ausencias = tipoAusencia;
+              historico[novoDataInicio].entrada = '---------';
+              historico[novoDataInicio].saida = '----------';
+            }
+          }
+        });
+      }
+
+      if (feriados) {
+        feriados.forEach((dadosFeriados) => {
+          const { dataInicio, dataFim, nome } = dadosFeriados;
+          const diaInicio = +dataInicio.split('-')[2];
+          const diaFim = +dataFim.split('-')[2];
+          var qnt = diaFim - diaInicio;
+          if (qnt < 1) {
+            historico.forEach((dadosHistorico) => {
+              if (diaInicio === dadosHistorico.d) {
+                dadosHistorico.feriados = nome;
+                dadosHistorico.entrada = '---------';
+                dadosHistorico.saida = '---------';
+              }
+            });
+          } else {
+            for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
+              historico[novoDataInicio].feriados = nome;
+              historico[novoDataInicio].entrada = '---------';
+              historico[novoDataInicio].saida = '---------';
+            }
+          }
+        });
+      }
+
+      return { historico, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao encontrar dados de horarios: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  //para o pdf
   async getHistoricoFuncionario(
     id_funcionario: number,
     mes: number,

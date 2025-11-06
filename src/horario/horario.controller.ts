@@ -71,7 +71,13 @@ export class HorarioController {
     @Param('ano') ano: string,
     @Res() res: Response,
   ) {
-    const horario = await this.horarioService.getHistoricoFuncionario(+id_funcionario, +mes, +ano);
+    const horario = await this.horarioService.getHistorico(+id_funcionario, +mes, +ano);
+    return res.status(horario.statusCode).json(horario);
+  }
+
+  @Get('/ano/:id_funcionario')
+  async ano(@Param('id_funcionario') id_funcionario: string, @Res() res: Response) {
+    const horario = await this.horarioService.dadosAnos(+id_funcionario);
     return res.status(horario.statusCode).json(horario);
   }
 }
