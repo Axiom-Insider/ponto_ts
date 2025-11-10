@@ -1,9 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -34,10 +29,7 @@ export class FuncionarioService {
         statusCode: HttpStatus.CREATED,
       };
     } catch (error) {
-      throw new HttpException(
-        `Erro ao criar Funcionário: ${error}`,
-        HttpStatus.NOT_IMPLEMENTED,
-      );
+      throw new HttpException(`Erro ao criar Funcionário: ${error}`, HttpStatus.NOT_IMPLEMENTED);
     }
   }
 
@@ -101,10 +93,23 @@ export class FuncionarioService {
     }
   }
 
-  async update(
-    id: number,
-    updateFuncionarioDto: UpdateFuncionarioDto,
-  ): Promise<IMessage> {
+  async resetarSenha(id: number) {
+    try {
+      const dados = await this.prisma.funcionarios.update({
+        where: { id },
+        data: { primeiraEntrada: false, senha: '123' },
+      });
+
+      return { message: 'Senha de funcionário resetada com sucesso', statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar a tabela funcionário: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async update(id: number, updateFuncionarioDto: UpdateFuncionarioDto): Promise<IMessage> {
     try {
       const found = await this.prisma.funcionarios.findUnique({
         where: { id },
@@ -125,10 +130,7 @@ export class FuncionarioService {
       }
       throw 'Nenhuma coluna foi alterada no sistema';
     } catch (error) {
-      throw new HttpException(
-        `Erro ao atualizar dados: ${error}`,
-        HttpStatus.NOT_MODIFIED,
-      );
+      throw new HttpException(`Erro ao atualizar dados: ${error}`, HttpStatus.NOT_MODIFIED);
     }
   }
 

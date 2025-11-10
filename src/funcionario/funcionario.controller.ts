@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards } from '@nestjs/common';
 import { FuncionarioService } from './funcionario.service';
 import { CreateFuncionarioDto } from './dto/create-funcionario.dto';
 import { UpdateFuncionarioDto } from './dto/update-funcionario.dto';
@@ -21,12 +11,8 @@ export class FuncionarioController {
   constructor(private readonly funcionarioService: FuncionarioService) {}
 
   @Post()
-  async create(
-    @Body() createFuncionarioDto: CreateFuncionarioDto,
-    @Res() res: Response,
-  ) {
-    const funcionario =
-      await this.funcionarioService.create(createFuncionarioDto);
+  async create(@Body() createFuncionarioDto: CreateFuncionarioDto, @Res() res: Response) {
+    const funcionario = await this.funcionarioService.create(createFuncionarioDto);
     return res.status(funcionario.statusCode).json(funcionario);
   }
 
@@ -48,10 +34,7 @@ export class FuncionarioController {
     @Body() updateFuncionarioDto: UpdateFuncionarioDto,
     @Res() res: Response,
   ) {
-    const funcionario = await this.funcionarioService.update(
-      +id,
-      updateFuncionarioDto,
-    );
+    const funcionario = await this.funcionarioService.update(+id, updateFuncionarioDto);
     return res.status(funcionario.statusCode).json(funcionario);
   }
 
