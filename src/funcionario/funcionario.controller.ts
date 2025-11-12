@@ -38,6 +38,12 @@ export class FuncionarioController {
     return res.status(funcionario.statusCode).json(funcionario);
   }
 
+  @Get('/buscar/:nome')
+  async buscar(@Res() res: Response, @Param('nome') nome: string) {
+    const dados = await this.funcionarioService.findNome(nome);
+    return res.status(dados.statusCode).json(dados.dados);
+  }
+
   @Delete(':id')
   async remove(@Param('id') id: string) {
     return this.funcionarioService.remove(+id);

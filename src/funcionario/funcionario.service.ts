@@ -75,8 +75,6 @@ export class FuncionarioService {
 
   async findCpf(cpf: string): Promise<IGenerico<FuncionarioOne>> {
     try {
-      console.log(cpf);
-
       const dados = await this.prisma.funcionarios.findFirst({
         where: { cpf },
       });
@@ -84,6 +82,21 @@ export class FuncionarioService {
       if (!dados) {
         throw 'Sem registro desse cpf';
       }
+      return { dados, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar a tabela funcionário: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async findNome(nome: string): Promise<{ dados: {}[]; statusCode: HttpStatus }> {
+    try {
+      const dados = await this.prisma.funcionarios.findMany({
+        where: { nome: { contains: nome.toLowerCase() }, adm: false },
+      });
+
       return { dados, statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
