@@ -16,7 +16,7 @@ export class FuncionarioService {
   async create(createFuncionarioDto: CreateFuncionarioDto) {
     try {
       const found = await this.prisma.funcionarios.findMany({
-        where: { OR: [{ matricula: createFuncionarioDto.matricula }] },
+        where: { OR: [{ cpf: createFuncionarioDto.cpf }] },
       });
 
       if (found.length > 0) {
