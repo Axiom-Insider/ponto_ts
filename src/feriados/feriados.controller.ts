@@ -11,8 +11,6 @@ export class FeriadosController {
 
   @Get('tipo/:ano/:tipo')
   findAnoteste(@Param('ano') ano: string, @Param('tipo') tipo: string) {
-    console.log(tipo);
-
     return this.feriadosService.findAnoTipo(ano, TipoFeriado[tipo]);
   }
 
