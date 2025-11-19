@@ -135,13 +135,20 @@ export class FuncionarioService {
         where: { id },
         data: updateFuncionarioDto,
       });
+      console.log(funcionario);
+
       if (funcionario.count > 0) {
+        const nomeSeparado = found.nome.split(' ');
+        var nome = `${nomeSeparado[0]} ${nomeSeparado[1]}`;
+        if (nomeSeparado[1].toLowerCase() === 'do' || nomeSeparado[1].toLowerCase() === 'de') {
+          nome = `${nomeSeparado[0]} ${nomeSeparado[1]} ${nomeSeparado[2]}`;
+        }
         return {
-          message: 'Dados atualizados com sucesso',
+          message: `Os Dados De ${nome} Foram Atualizado Com Sucesso`,
           statusCode: HttpStatus.OK,
         };
       }
-      throw 'Nenhuma coluna foi alterada no sistema';
+      throw 'Nenhuma dados foi atualizado';
     } catch (error) {
       throw new HttpException(`Erro ao atualizar dados: ${error}`, HttpStatus.NOT_MODIFIED);
     }
