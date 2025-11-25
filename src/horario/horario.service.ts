@@ -276,42 +276,36 @@ export class HorarioService {
       const ausencias = await this.ausencias.findMesAno(id_funcionario, mes, ano);
       const feriados = await this.feriados.findMesAno(mes, ano);
       const horarios = await this.prisma.horarios.findMany({
-        where: { id_funcionario },
+        where: {
+          id_funcionario,
+          dataCriada: {
+            startsWith: `${ano}-${String(mes).padStart(2, '0')}`,
+          },
+        },
       });
       const qntDia = new Date(ano, mes, 0).getDate();
       const historico = [];
+
       for (let index = 1; index <= qntDia; index++) {
         historico.push({
-          id: '',
           dia: index,
-          diaNome: this.nomeDia(ano, mes, index),
+          nomeDia: this.nomeDia(ano, mes, index),
           entrada: ':',
           saida: ':',
-          ausencias: '',
-          feriados: '',
+          ausencia: '',
+          feriado: '',
         });
       }
-
-      if (horarios) {
-        historico.forEach((dadosHisotrico) => {
-          horarios.forEach((dadosHorarios) => {
-            const { dataCriada, entrada, saida, id } = dadosHorarios;
-            const anoH = dataCriada.split('-')[0];
-            const mesH = dataCriada.split('-')[1];
-            if (ano === +anoH) {
-              if (mes === +mesH) {
-                const dia = dataCriada.split('-')[2];
-                if (dadosHisotrico.dia === +dia) {
-                  if (dadosHisotrico.nomeDia) dadosHisotrico.id = id;
-                  dadosHisotrico.id = id;
-                  dadosHisotrico.entrada = entrada === null ? ':' : entrada;
-                  dadosHisotrico.saida = saida === null ? ':' : saida;
-                }
-              }
-            }
-          });
+      horarios.forEach((horarios) => {
+        const { entrada, saida, dataCriada } = horarios;
+        const dia = +dataCriada.split('-')[2];
+        historico.forEach((historico) => {
+          if (historico.dia === dia) {
+            historico.entrada = entrada;
+            historico.saida = saida;
+          }
         });
-      }
+      });
 
       if (ausencias) {
         ausencias.forEach((element) => {
@@ -321,16 +315,16 @@ export class HorarioService {
           var qnt = diaFim - diaInicio;
           if (qnt < 1) {
             historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.d) {
+              if (diaInicio === dadosHistorico.dia) {
                 dadosHistorico.entrada = '---------';
                 dadosHistorico.saida = '---------';
-                dadosHistorico.ausencias = tipoAusencia;
+                dadosHistorico.ausencia = tipoAusencia;
               }
             });
           } else {
             let novoDataInicio = diaInicio - 1;
             for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].ausencias = tipoAusencia;
+              historico[novoDataInicio].ausencia = tipoAusencia;
               historico[novoDataInicio].entrada = '---------';
               historico[novoDataInicio].saida = '----------';
             }
@@ -346,15 +340,15 @@ export class HorarioService {
           var qnt = diaFim - diaInicio;
           if (qnt < 1) {
             historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.d) {
-                dadosHistorico.feriados = nome;
+              if (diaInicio === dadosHistorico.dia) {
+                dadosHistorico.feriado = ` = ${nome}`;
                 dadosHistorico.entrada = '---------';
                 dadosHistorico.saida = '---------';
               }
             });
           } else {
             for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].feriados = nome;
+              historico[novoDataInicio].feriado = `${nome}`;
               historico[novoDataInicio].entrada = '---------';
               historico[novoDataInicio].saida = '---------';
             }
