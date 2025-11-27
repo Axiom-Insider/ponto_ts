@@ -310,23 +310,46 @@ export class HorarioService {
       if (ausencias) {
         ausencias.forEach((element) => {
           const { dataInicio, dataFim, tipoAusencia } = element;
+          const mesInicio = +dataInicio.split('-')[1];
+          const mesFim = +dataFim.split('-')[1];
           const diaInicio = +dataInicio.split('-')[2];
           const diaFim = +dataFim.split('-')[2];
           var qnt = diaFim - diaInicio;
-          if (qnt < 1) {
-            historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.dia) {
-                dadosHistorico.entrada = '---------';
-                dadosHistorico.saida = '---------';
-                dadosHistorico.ausencia = tipoAusencia;
+
+          if (mesInicio == mesFim) {
+            if (qnt < 1) {
+              historico.forEach((dadosHistorico) => {
+                if (diaInicio === dadosHistorico.dia) {
+                  dadosHistorico.entrada = '---------';
+                  dadosHistorico.saida = '---------';
+                  dadosHistorico.ausencia = tipoAusencia;
+                }
+              });
+            } else {
+              let novoDataInicio = diaInicio - 1;
+              for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+                historico[novoDataInicio].ausencia = tipoAusencia;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '----------';
               }
-            });
+            }
           } else {
-            let novoDataInicio = diaInicio - 1;
-            for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].ausencia = tipoAusencia;
-              historico[novoDataInicio].entrada = '---------';
-              historico[novoDataInicio].saida = '----------';
+            if (mesInicio == mes) {
+              const dia = diaInicio;
+              for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
+                historico[novoDataInicio].ausencia = tipoAusencia;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
+              }
+            }
+            if (mesFim == mes) {
+              var dia = diaFim;
+              while (dia > 0) {
+                dia--;
+                historico[dia].ausencia = tipoAusencia;
+                historico[dia].entrada = '---------';
+                historico[dia].saida = '---------';
+              }
             }
           }
         });
@@ -335,22 +358,44 @@ export class HorarioService {
       if (feriados) {
         feriados.forEach((dadosFeriados) => {
           const { dataInicio, dataFim, nome } = dadosFeriados;
+          const mesInicio = +dataInicio.split('-')[1];
+          const mesFim = +dataFim.split('-')[1];
           const diaInicio = +dataInicio.split('-')[2];
           const diaFim = +dataFim.split('-')[2];
           var qnt = diaFim - diaInicio;
-          if (qnt < 1) {
-            historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.dia) {
-                dadosHistorico.feriado = ` = ${nome}`;
-                dadosHistorico.entrada = '---------';
-                dadosHistorico.saida = '---------';
+          if (mesInicio === mesFim) {
+            if (qnt < 1) {
+              historico.forEach((dadosHistorico) => {
+                if (diaInicio === dadosHistorico.dia) {
+                  dadosHistorico.feriado = `${nome}`;
+                  dadosHistorico.entrada = '---------';
+                  dadosHistorico.saida = '---------';
+                }
+              });
+            } else {
+              for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
+                historico[novoDataInicio].feriado = nome;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
               }
-            });
+            }
           } else {
-            for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].feriado = `${nome}`;
-              historico[novoDataInicio].entrada = '---------';
-              historico[novoDataInicio].saida = '---------';
+            if (mesInicio == mes) {
+              const dia = diaInicio;
+              for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
+                historico[novoDataInicio].feriado = nome;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
+              }
+            }
+            if (mesFim == mes) {
+              var dia = diaFim;
+              while (dia > 0) {
+                dia--;
+                historico[dia].feriado = nome;
+                historico[dia].entrada = '---------';
+                historico[dia].saida = '---------';
+              }
             }
           }
         });
@@ -416,50 +461,144 @@ export class HorarioService {
           });
         });
       }
+
+      // if (ausencias) {
+      //   ausencias.forEach((element) => {
+      //     const { dataInicio, dataFim, tipoAusencia } = element;
+      //     const diaInicio = +dataInicio.split('-')[2];
+      //     const diaFim = +dataFim.split('-')[2];
+      //     var qnt = diaFim - diaInicio;
+      //     if (qnt < 1) {
+      //       historico.forEach((dadosHistorico) => {
+      //         if (diaInicio === dadosHistorico.d) {
+      //           dadosHistorico.entrada = '---------';
+      //           dadosHistorico.saida = '---------';
+      //           dadosHistorico.ausencias = tipoAusencia;
+      //         }
+      //       });
+      //     } else {
+      //       let novoDataInicio = diaInicio - 1;
+      //       for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+      //         historico[novoDataInicio].ausencias = tipoAusencia;
+      //         historico[novoDataInicio].entrada = '---------';
+      //         historico[novoDataInicio].saida = '----------';
+      //       }
+      //     }
+      //   });
+      // }
+
       if (ausencias) {
         ausencias.forEach((element) => {
           const { dataInicio, dataFim, tipoAusencia } = element;
+          const mesInicio = +dataInicio.split('-')[1];
+          const mesFim = +dataFim.split('-')[1];
           const diaInicio = +dataInicio.split('-')[2];
           const diaFim = +dataFim.split('-')[2];
           var qnt = diaFim - diaInicio;
-          if (qnt < 1) {
-            historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.d) {
-                dadosHistorico.entrada = '---------';
-                dadosHistorico.saida = '---------';
-                dadosHistorico.ausencias = tipoAusencia;
+          if (mesInicio == mesFim) {
+            if (qnt < 1) {
+              historico.forEach((dadosHistorico) => {
+                if (diaInicio === dadosHistorico.d) {
+                  dadosHistorico.ausencias = tipoAusencia;
+                  dadosHistorico.entrada = '---------';
+                  dadosHistorico.saida = '---------';
+                }
+              });
+            } else {
+              let novoDataInicio = diaInicio - 1;
+              for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
+                historico[novoDataInicio].ausencias = tipoAusencia;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '----------';
               }
-            });
+            }
           } else {
-            let novoDataInicio = diaInicio - 1;
-            for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].ausencias = tipoAusencia;
-              historico[novoDataInicio].entrada = '---------';
-              historico[novoDataInicio].saida = '----------';
+            if (mesInicio == mes) {
+              const dia = diaInicio;
+              for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
+                historico[novoDataInicio].ausencias = tipoAusencia;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
+              }
+            }
+            if (mesFim == mes) {
+              var dia = diaFim;
+              while (dia > 0) {
+                dia--;
+                historico[dia].ausencias = tipoAusencia;
+                historico[dia].entrada = '---------';
+                historico[dia].saida = '---------';
+              }
             }
           }
         });
       }
 
+      // if (feriados) {
+      //   feriados.forEach((dadosFeriados) => {
+      //     const { dataInicio, dataFim, nome, tipoFeriado } = dadosFeriados;
+      //     const diaInicio = +dataInicio.split('-')[2];
+      //     const diaFim = +dataFim.split('-')[2];
+      //     var qnt = diaFim - diaInicio;
+      //     if (qnt < 1) {
+      //       historico.forEach((dadosHistorico) => {
+      //         if (diaInicio === dadosHistorico.d) {
+      //           dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
+      //           dadosHistorico.entrada = '---------';
+      //           dadosHistorico.saida = '---------';
+      //         }
+      //       });
+      //     } else {
+      //       for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
+      //         historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
+      //         historico[novoDataInicio].entrada = '---------';
+      //         historico[novoDataInicio].saida = '---------';
+      //       }
+      //     }
+      //   });
+      // }
+
       if (feriados) {
         feriados.forEach((dadosFeriados) => {
           const { dataInicio, dataFim, nome, tipoFeriado } = dadosFeriados;
+          const mesInicio = +dataInicio.split('-')[1];
+          const mesFim = +dataFim.split('-')[1];
           const diaInicio = +dataInicio.split('-')[2];
           const diaFim = +dataFim.split('-')[2];
           var qnt = diaFim - diaInicio;
-          if (qnt < 1) {
-            historico.forEach((dadosHistorico) => {
-              if (diaInicio === dadosHistorico.d) {
-                dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
-                dadosHistorico.entrada = '---------';
-                dadosHistorico.saida = '---------';
+          if (mesInicio === mesFim) {
+            if (qnt < 1) {
+              historico.forEach((dadosHistorico) => {
+                if (diaInicio === dadosHistorico.d) {
+                  dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
+                  dadosHistorico.entrada = '---------';
+                  dadosHistorico.saida = '---------';
+                }
+              });
+            } else {
+              for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
+                historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
               }
-            });
+            }
           } else {
-            for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
-              historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
-              historico[novoDataInicio].entrada = '---------';
-              historico[novoDataInicio].saida = '---------';
+            if (mesInicio == mes) {
+              const dia = diaInicio;
+              for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
+                historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
+                historico[novoDataInicio].entrada = '---------';
+                historico[novoDataInicio].saida = '---------';
+              }
+            }
+            if (mesFim == mes) {
+              var dia = diaFim;
+              while (dia > 0) {
+                dia--;
+                historico[dia].feriados = `${tipoFeriado} = ${nome}`;
+                historico[dia].entrada = '---------';
+                historico[dia].saida = '---------';
+              }
             }
           }
         });
