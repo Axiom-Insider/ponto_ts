@@ -75,6 +75,17 @@ export class HorarioController {
     return res.status(horario.statusCode).json(horario);
   }
 
+  @Get('/estatisticas/:id_funcionario/:mes/:ano')
+  async estatisticas(
+    @Param('id_funcionario') id_funcionario: string,
+    @Param('mes') mes: string,
+    @Param('ano') ano: string,
+    @Res() res: Response,
+  ) {
+    const horario = await this.horarioService.dadosDeHorarios(+id_funcionario, +mes, +ano);
+    return res.status(horario.statusCode).json(horario);
+  }
+
   @Get('/ano/:id_funcionario')
   async ano(@Param('id_funcionario') id_funcionario: string, @Res() res: Response) {
     const horario = await this.horarioService.dadosAnos(+id_funcionario);
