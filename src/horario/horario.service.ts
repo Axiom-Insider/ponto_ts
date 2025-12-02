@@ -11,6 +11,7 @@ import { HorarioDoDia } from 'src/interfaces/horarios/horarioDoDia';
 import { stat } from 'fs';
 import { AusenciaService } from 'src/ausencia/ausencia.service';
 import { FeriadosService } from 'src/feriados/feriados.service';
+import { log } from 'console';
 
 @Injectable()
 export class HorarioService {
@@ -292,8 +293,8 @@ export class HorarioService {
           nomeDia: this.nomeDia(ano, mes, index),
           entrada: ':',
           saida: ':',
-          ausencia: '',
-          feriado: '',
+          ausencia: null,
+          feriado: null,
         });
       }
       horarios.forEach((horarios) => {
@@ -754,6 +755,8 @@ export class HorarioService {
 
   async dadosDeHorarios(id_funcionario: number, mes: number, ano: number) {
     try {
+      const { historico } = await this.getHistorico(id_funcionario, mes, ano);
+
       const horarios = await this.prisma.horarios.findMany({
         where: {
           id_funcionario,
@@ -762,6 +765,7 @@ export class HorarioService {
           },
         },
       });
+
       if (horarios) {
         var totalH = [];
         horarios.forEach((horas) => {
@@ -779,34 +783,34 @@ export class HorarioService {
       }
       const total = totalH.reduce((acc, min) => acc + min, 0);
 
-      const estatisticas = {
-        totalHorasTrabalhada: `${String(Math.floor(total / 60)).padStart(2, '0')}:${total % 60}`,
-      };
+      const totalHorasTrabalhada = String(Math.floor(total / 60)).padStart(2, '0');
 
       const qntDia = new Date(ano, mes, 0).getDate();
       const mesAtual = new Date().getMonth() + 1;
-      console.log(mesAtual, mes);
 
       if (mesAtual != mes) {
         var faltas = 0;
-        var temp = 0;
-        for (let index = 0; index < qntDia; index++) {
-          horarios.forEach((horario) => {
-            const { dataCriada } = horario;
-            const diaBanco = +dataCriada.split('-')[2];
-            if (diaBanco === index) {
-              temp++;
+        historico.forEach((element) => {
+          const { entrada, saida, feriado, ausencia } = element;
+          console.log(entrada, saida, feriado, ausencia);
+
+          if (feriado == null) {
+            faltas++;
+          } else {
+            if (ausencia == null) {
+              faltas++;
+            } else {
+              if (entrada == ':' && saida == ':') {
+                faltas++;
+              }
             }
-          });
-        }
-        faltas = qntDia - temp;
+          }
+        });
       } else {
         var faltas = 0;
       }
 
-      console.log(faltas);
-
-      return { faltas, estatisticas, statusCode: HttpStatus.OK };
+      return { faltas, totalHorasTrabalhada, statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
         `Erro ao encontrar dados de horarios: ${error}`,
