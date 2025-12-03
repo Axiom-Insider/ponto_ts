@@ -11,7 +11,6 @@ import { HorarioDoDia } from 'src/interfaces/horarios/horarioDoDia';
 import { stat } from 'fs';
 import { AusenciaService } from 'src/ausencia/ausencia.service';
 import { FeriadosService } from 'src/feriados/feriados.service';
-import { log } from 'console';
 
 @Injectable()
 export class HorarioService {
@@ -792,12 +791,11 @@ export class HorarioService {
         var faltas = 0;
         historico.forEach((element) => {
           const { entrada, saida, feriado, ausencia } = element;
-          console.log(entrada, saida, feriado, ausencia);
-
-          if (feriado == null) {
+          
+          if (feriado) {
             faltas++;
           } else {
-            if (ausencia == null) {
+            if (ausencia) {
               faltas++;
             } else {
               if (entrada == ':' && saida == ':') {
