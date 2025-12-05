@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Res } from '@nestjs/common';
 import { DocumentoService } from './documento.service';
 import { Response } from 'express';
+import * as fs from 'fs';
 
 @Controller('documento')
 export class DocumentoController {
@@ -14,13 +15,18 @@ export class DocumentoController {
     @Res() res: Response,
   ) {
     try {
-      const buffer = await this.documentoService.polouab(
-        +id_funcionario,
-        +mes,
-        +ano,
-      );
+      const caminho = await this.documentoService.polouab(+id_funcionario, +mes, +ano);
 
-      return res.download(buffer);
+      return res.download(caminho, (erro) => {
+        if (erro) {
+          console.log('Erro no download', erro);
+        } else {
+          fs.unlink(caminho, (erro) => {
+            if (erro) console.error('Erro ao excluir:', erro);
+            else console.log('Arquivo removido:', caminho);
+          });
+        }
+      });
     } catch (error) {
       console.error('Erro ao enviar o arquivo:', error);
       return res.status(500).send('Erro ao enviar o documento');
@@ -35,13 +41,18 @@ export class DocumentoController {
     @Res() res: Response,
   ) {
     try {
-      const buffer = await this.documentoService.confianca(
-        +id_funcionario,
-        +mes,
-        +ano,
-      );
+      const caminho = await this.documentoService.confianca(+id_funcionario, +mes, +ano);
 
-      return res.download(buffer);
+      return res.download(caminho, (erro) => {
+        if (erro) {
+          console.log('Erro no download', erro);
+        } else {
+          fs.unlink(caminho, (erro) => {
+            if (erro) console.error('Erro ao excluir:', erro);
+            else console.log('Arquivo removido:');
+          });
+        }
+      });
     } catch (error) {
       console.error('Erro ao enviar o arquivo:', error);
       return res.status(500).send('Erro ao enviar o documento');
