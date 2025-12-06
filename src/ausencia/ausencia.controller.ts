@@ -17,6 +17,22 @@ export class AusenciaController {
     return this.ausenciaService.findAll();
   }
 
+  @Get(':id_funcionario/:mes/:ano')
+  findMesAno(
+    @Param('id_funcionario') id_funcionario: string,
+    @Param('mes') mes: string,
+    @Param('ano') ano: string,
+  ) {
+    return this.ausenciaService.findMesAno(+id_funcionario, +mes, +ano);
+  }
+
+  @Get('ano/:id_funcionario')
+  findAno(
+    @Param('id_funcionario') id_funcionario: string,
+  ) {
+    return this.ausenciaService.findDadosAnos(+id_funcionario);
+  } 
+
   @Get(':id_funcionario')
   findOne(@Param('id_funcionario') id_funcionario: string) {
     return this.ausenciaService.findOne(+id_funcionario);

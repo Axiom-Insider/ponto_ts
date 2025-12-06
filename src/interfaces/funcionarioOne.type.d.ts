@@ -7,5 +7,5 @@
     nome:string,
     cargo:string,
     turno:string,
-    senha:string
+    senha:string,
 }

@@ -62,12 +62,13 @@ export class AusenciaService {
       const dadosAusencia = await this.prisma.ausencias.findMany();
       const ausencias = [];
       for (let index = 0; index < dadosAusencia.length; index++) {
-        const { dataInicio, dataFim, tipoAusencia } = dadosAusencia[index];
+        const { dataInicio, dataFim, tipoAusencia, id } = dadosAusencia[index];
         const tempAnoInicio = dataInicio.split('-')[0];
         const tempMesInicio = dataInicio.split('-')[1];
         if (ano === +tempAnoInicio) {
           if (mes === +tempMesInicio) {
             ausencias.push({
+              id,
               tipoAusencia,
               dataInicio,
               dataFim,
@@ -80,6 +81,7 @@ export class AusenciaService {
         if (ano === +tempAnoFim) {
           if (mes === +tempMesFim) {
             ausencias.push({
+              id,
               tipoAusencia,
               dataInicio,
               dataFim,
@@ -94,6 +96,23 @@ export class AusenciaService {
       throw new HttpException(
         `Erro ao consultar a tabela ausência ${error.message}`,
         HttpStatus.CONFLICT,
+      );
+    }
+  }
+
+  async findDadosAnos(id_funcionario:number): Promise<{ dados: {}; statusCode: HttpStatus }> {
+    try {
+      const dados = await this.prisma.$queryRaw`
+      SELECT DISTINCT LEFT(dataInicio, 4) AS ano
+      FROM Ausencias
+      WHERE id_funcionario = ${id_funcionario}
+      ORDER BY ano DESC
+      `;
+      return { dados, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao consultar tabela feriados: ${error.message}`,
+        HttpStatus.NOT_FOUND,
       );
     }
   }
