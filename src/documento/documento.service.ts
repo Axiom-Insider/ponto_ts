@@ -32,13 +32,7 @@ export class DocumentoService {
       );
       var user = historico.historico;
 
-      const filePath = path.join(
-        __dirname,
-        '..',
-        'documento',
-        'pdfs',
-        'folhaDePontoPoloUAB.docx',
-      );
+      const filePath = path.join(__dirname, '..', 'documento', 'pdfs', 'folhaDePontoPoloUAB.docx');
       const content = fs.readFileSync(filePath, 'binary');
 
       // 2. Carregar no PizZip
@@ -69,10 +63,7 @@ export class DocumentoService {
 
       var nomeArquivo = nome;
       nomeArquivo = nomeArquivo.replace(/\s/g, '-');
-      fs.writeFileSync(
-        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-PoloUAB.docx`,
-        buffer,
-      );
+      fs.writeFileSync(`documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-PoloUAB.docx`, buffer);
       const saida = path.join(
         __dirname,
         '..',
@@ -96,12 +87,11 @@ export class DocumentoService {
       const nomeMes = this.nomeMes(mes).toUpperCase();
       const funcionario = await this.funcionarioService.findId(id_funcionario);
       const { nome, cargo, cpf } = funcionario.dados;
-      const historico =
-        await this.horariosService.getHistoricoFuncionarioConfianca(
-          id_funcionario,
-          mes,
-          ano,
-        );
+      const historico = await this.horariosService.getHistoricoFuncionarioConfianca(
+        id_funcionario,
+        mes,
+        ano,
+      );
       var user = historico.historico;
 
       const filePath = path.join(
@@ -140,10 +130,7 @@ export class DocumentoService {
 
       var nomeArquivo = nome;
       nomeArquivo = nomeArquivo.replace(/\s/g, '-');
-      fs.writeFileSync(
-        `documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-Confianca.docx`,
-        buffer,
-      );
+      fs.writeFileSync(`documentos/folhaDePonto-${nomeMes}-${nomeArquivo}-Confianca.docx`, buffer);
       const saida = path.join(
         __dirname,
         '..',

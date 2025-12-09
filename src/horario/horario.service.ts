@@ -608,8 +608,8 @@ export class HorarioService {
           s_e: '--------',
           p_s: '--------',
           s_s: '--------',
-          ausencias: '',
-          feriados: '',
+          au: '',
+          f: '',
         });
       }
 
@@ -662,35 +662,27 @@ export class HorarioService {
             if (qnt < 1) {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.d) {
-                  dadosHistorico.ausencias = tipoAusencia;
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
+                  dadosHistorico.au = tipoAusencia;
                 }
               });
             } else {
               let novoDataInicio = diaInicio - 1;
               for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
-                historico[novoDataInicio].ausencias = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '----------';
+                historico[novoDataInicio].au = tipoAusencia;
               }
             }
           } else {
             if (mesInicio == mes) {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
-                historico[novoDataInicio].ausencias = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
+                historico[novoDataInicio].au = tipoAusencia;
               }
             }
             if (mesFim == mes) {
               var dia = diaFim;
               while (dia > 0) {
                 dia--;
-                historico[dia].ausencias = tipoAusencia;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
+                historico[dia].au = tipoAusencia;
               }
             }
           }
@@ -709,34 +701,26 @@ export class HorarioService {
             if (qnt < 1) {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.d) {
-                  dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
+                  dadosHistorico.f = ` ${tipoFeriado} = ${nome}`;
                 }
               });
             } else {
               for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
-                historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
+                historico[novoDataInicio].f = ` ${tipoFeriado} = ${nome}`;
               }
             }
           } else {
             if (mesInicio == mes) {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
-                historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
+                historico[novoDataInicio].f = ` ${tipoFeriado} = ${nome}`;
               }
             }
             if (mesFim == mes) {
               var dia = diaFim;
               while (dia > 0) {
                 dia--;
-                historico[dia].feriados = `${tipoFeriado} = ${nome}`;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
+                historico[dia].f = ` ${tipoFeriado} = ${nome}`;
               }
             }
           }
@@ -791,7 +775,7 @@ export class HorarioService {
         var faltas = 0;
         historico.forEach((element) => {
           const { entrada, saida, feriado, ausencia } = element;
-          
+
           if (feriado) {
             faltas++;
           } else {
