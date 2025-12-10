@@ -288,6 +288,7 @@ export class HorarioService {
 
       for (let index = 1; index <= qntDia; index++) {
         historico.push({
+          id: null,
           dia: index,
           nomeDia: this.nomeDia(ano, mes, index),
           entrada: ':',
@@ -297,10 +298,11 @@ export class HorarioService {
         });
       }
       horarios.forEach((horarios) => {
-        const { entrada, saida, dataCriada } = horarios;
+        const { entrada, saida, dataCriada, id } = horarios;
         const dia = +dataCriada.split('-')[2];
         historico.forEach((historico) => {
           if (historico.dia === dia) {
+            historico.id = id;
             historico.entrada = entrada ? entrada : ':';
             historico.saida = saida ? saida : ':';
           }
@@ -320,8 +322,6 @@ export class HorarioService {
             if (qnt < 1) {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.dia) {
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
                   dadosHistorico.ausencia = tipoAusencia;
                 }
               });
@@ -329,8 +329,6 @@ export class HorarioService {
               let novoDataInicio = diaInicio - 1;
               for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
                 historico[novoDataInicio].ausencia = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '----------';
               }
             }
           } else {
@@ -338,8 +336,6 @@ export class HorarioService {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
                 historico[novoDataInicio].ausencia = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
             if (mesFim == mes) {
@@ -347,8 +343,6 @@ export class HorarioService {
               while (dia > 0) {
                 dia--;
                 historico[dia].ausencia = tipoAusencia;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
               }
             }
           }
@@ -368,15 +362,11 @@ export class HorarioService {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.dia) {
                   dadosHistorico.feriado = `${nome}`;
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
                 }
               });
             } else {
               for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
                 historico[novoDataInicio].feriado = nome;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
           } else {
@@ -384,8 +374,6 @@ export class HorarioService {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
                 historico[novoDataInicio].feriado = nome;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
             if (mesFim == mes) {
@@ -393,8 +381,6 @@ export class HorarioService {
               while (dia > 0) {
                 dia--;
                 historico[dia].feriado = nome;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
               }
             }
           }
@@ -480,16 +466,12 @@ export class HorarioService {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.d) {
                   dadosHistorico.ausencias = tipoAusencia;
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
                 }
               });
             } else {
               let novoDataInicio = diaInicio - 1;
               for (novoDataInicio; novoDataInicio < diaFim; novoDataInicio++) {
                 historico[novoDataInicio].ausencias = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '----------';
               }
             }
           } else {
@@ -497,8 +479,6 @@ export class HorarioService {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
                 historico[novoDataInicio].ausencias = tipoAusencia;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
             if (mesFim == mes) {
@@ -506,8 +486,6 @@ export class HorarioService {
               while (dia > 0) {
                 dia--;
                 historico[dia].ausencias = tipoAusencia;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
               }
             }
           }
@@ -527,15 +505,11 @@ export class HorarioService {
               historico.forEach((dadosHistorico) => {
                 if (diaInicio === dadosHistorico.d) {
                   dadosHistorico.feriados = `${tipoFeriado} = ${nome}`;
-                  dadosHistorico.entrada = '---------';
-                  dadosHistorico.saida = '---------';
                 }
               });
             } else {
               for (let novoDataInicio = diaInicio - 1; novoDataInicio < diaFim; novoDataInicio++) {
                 historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
           } else {
@@ -543,8 +517,6 @@ export class HorarioService {
               const dia = diaInicio;
               for (let novoDataInicio = dia - 1; novoDataInicio < qntDia; novoDataInicio++) {
                 historico[novoDataInicio].feriados = `${tipoFeriado} = ${nome}`;
-                historico[novoDataInicio].entrada = '---------';
-                historico[novoDataInicio].saida = '---------';
               }
             }
             if (mesFim == mes) {
@@ -552,8 +524,6 @@ export class HorarioService {
               while (dia > 0) {
                 dia--;
                 historico[dia].feriados = `${tipoFeriado} = ${nome}`;
-                historico[dia].entrada = '---------';
-                historico[dia].saida = '---------';
               }
             }
           }
@@ -633,13 +603,15 @@ export class HorarioService {
                         var rando = Math.floor(Math.random() * 8) + 1;
                         dadosHisotrico.s_e = `${hora_entrada}:0${rando}`;
                         var hora_saida = 18;
-                        dadosHisotrico.s_s = `${hora_saida}:0${rando + (Math.floor(Math.random() * 4) + 1)}`;
+                        var minutosTemp = rando + (Math.floor(Math.random() * 7) + 1);
+                        dadosHisotrico.s_s = `${hora_saida}:${minutosTemp < 10 ? '0' + minutosTemp : minutosTemp}`;
                       } else {
                         var hora_entrada = 8;
                         var rando = Math.floor(Math.random() * 8) + 1;
                         dadosHisotrico.s_e = `0${hora_entrada}:0${rando}`;
                         var hora_saida = 12;
-                        dadosHisotrico.s_s = `${hora_saida}:0${rando + (Math.floor(Math.random() * 4) + 1)}`;
+                        var minutosTemp = rando + (Math.floor(Math.random() * 4) + 1);
+                        dadosHisotrico.s_s = `${hora_saida}:${minutosTemp < 10 ? '0' + minutosTemp : minutosTemp}`;
                       }
                     }
                   }
@@ -768,7 +740,6 @@ export class HorarioService {
 
       const totalHorasTrabalhada = String(Math.floor(total / 60)).padStart(2, '0');
 
-      const qntDia = new Date(ano, mes, 0).getDate();
       const mesAtual = new Date().getMonth() + 1;
 
       if (mesAtual != mes) {
@@ -793,6 +764,18 @@ export class HorarioService {
       }
 
       return { faltas, totalHorasTrabalhada, statusCode: HttpStatus.OK };
+    } catch (error) {
+      throw new HttpException(
+        `Erro ao encontrar dados de horarios: ${error}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  async apagarHorarario(id: number) {
+    try {
+      await this.prisma.horarios.delete({ where: { id } });
+      return { message: 'Horário apagado com sucesso!', statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
         `Erro ao encontrar dados de horarios: ${error}`,

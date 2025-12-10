@@ -91,4 +91,9 @@ export class HorarioController {
     const horario = await this.horarioService.dadosAnos(+id_funcionario);
     return res.status(horario.statusCode).json(horario);
   }
+
+  @Delete(':id')
+  async apagar(@Param('id') id: string) {
+    return await this.horarioService.apagarHorarario(+id);
+  }
 }
