@@ -59,7 +59,7 @@ export class AusenciaService {
 
   async findMesAno(id_funcionario: number, mes: number, ano: number) {
     try {
-      const dadosAusencia = await this.prisma.ausencias.findMany();
+      const dadosAusencia = await this.prisma.ausencias.findMany({ where: { id_funcionario } });
       const ausencias = [];
       for (let index = 0; index < dadosAusencia.length; index++) {
         const { dataInicio, dataFim, tipoAusencia, id } = dadosAusencia[index];
@@ -91,6 +91,14 @@ export class AusenciaService {
         }
       }
 
+      ausencias.forEach((dados) => {
+        const { dataInicio, dataFim } = dados;
+        var tempInicio = dataInicio.split('-');
+        var tempFim = dataFim.split('-');
+        dados.dataInicio = `${tempInicio[2]}/${tempInicio[1]}/${tempInicio[0]}`;
+        dados.dataFim = `${tempFim[2]}/${tempFim[1]}/${tempFim[0]}`;
+      });
+
       return ausencias;
     } catch (error) {
       throw new HttpException(
@@ -100,7 +108,7 @@ export class AusenciaService {
     }
   }
 
-  async findDadosAnos(id_funcionario:number): Promise<{ dados: {}; statusCode: HttpStatus }> {
+  async findDadosAnos(id_funcionario: number): Promise<{ dados: {}; statusCode: HttpStatus }> {
     try {
       const dados = await this.prisma.$queryRaw`
       SELECT DISTINCT LEFT(dataInicio, 4) AS ano
@@ -108,6 +116,8 @@ export class AusenciaService {
       WHERE id_funcionario = ${id_funcionario}
       ORDER BY ano DESC
       `;
+      console.log(dados);
+
       return { dados, statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
