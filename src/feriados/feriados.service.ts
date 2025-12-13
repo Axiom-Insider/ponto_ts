@@ -66,6 +66,15 @@ export class FeriadosService {
           ],
         },
       });
+      dados.forEach((dados) => {
+        const { dataInicio, dataFim } = dados;
+        var tempInicio = dataInicio.split('-');
+        var temFim = dataFim.split('-');
+
+        dados.dataInicio = `${tempInicio[2]}/${tempInicio[1]}/${tempInicio[0]}`;
+        dados.dataFim = `${temFim[2]}/${temFim[1]}/${temFim[0]}`;
+      });
+
       return { dados, statusCode: HttpStatus.OK };
     } catch (error) {
       throw new HttpException(
