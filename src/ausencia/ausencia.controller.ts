@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { AusenciaService } from './ausencia.service';
 import { CreateAusenciaDto } from './dto/create-ausencia.dto';
 import { UpdateAusenciaDto } from './dto/update-ausencia.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('ausencia')
 export class AusenciaController {
   constructor(private readonly ausenciaService: AusenciaService) {}
-  
+
   @Post()
   create(@Body() createAusenciaDto: CreateAusenciaDto) {
     return this.ausenciaService.create(createAusenciaDto);
@@ -27,11 +29,9 @@ export class AusenciaController {
   }
 
   @Get('ano/:id_funcionario')
-  findAno(
-    @Param('id_funcionario') id_funcionario: string,
-  ) {
+  findAno(@Param('id_funcionario') id_funcionario: string) {
     return this.ausenciaService.findDadosAnos(+id_funcionario);
-  } 
+  }
 
   @Get(':id_funcionario')
   findOne(@Param('id_funcionario') id_funcionario: string) {
@@ -47,5 +47,4 @@ export class AusenciaController {
   remove(@Param('id') id: string) {
     return this.ausenciaService.remove(+id);
   }
-    
 }

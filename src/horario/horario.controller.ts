@@ -5,6 +5,7 @@ import { CreateHorarioDto } from './dto/create-horario.dto';
 import { UpdateHorarioDto } from './dto/update-horario.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('horarios')
 export class HorarioController {
   constructor(private readonly horarioService: HorarioService) {}

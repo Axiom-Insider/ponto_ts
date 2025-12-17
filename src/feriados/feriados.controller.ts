@@ -5,6 +5,7 @@ import { UpdateFeriadoDto } from './dto/update-feriado.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { TipoFeriado } from '@prisma/client';
 
+@UseGuards(AuthGuard)
 @Controller('feriados')
 export class FeriadosController {
   constructor(private readonly feriadosService: FeriadosService) {}
